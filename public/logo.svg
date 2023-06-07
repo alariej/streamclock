@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.41786427"
+     inkscape:cx="160.33915"
+     inkscape:cy="494.1796"
+     inkscape:window-width="958"
+     inkscape:window-height="1030"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-39.110508,-73.932938)">
+    <path
+       id="rect1837"
+       style="opacity:1;fill:#4682b4;stroke-width:0;fill-opacity:1"
+       d="M 49.110414 73.932938 C 43.57042 73.932938 39.110508 78.39285 39.110508 83.932844 L 39.110508 163.93313 C 39.110508 169.47312 43.57042 173.93304 49.110414 173.93304 L 129.1107 173.93304 C 134.65069 173.93304 139.11061 169.47312 139.11061 163.93313 L 139.11061 83.932844 C 139.11061 78.39285 134.65069 73.932938 129.1107 73.932938 L 49.110414 73.932938 z M 57.110443 95.781734 L 121.11067 95.781734 C 122.77267 95.781734 124.11049 97.119552 124.11049 98.78155 L 124.11049 112.78173 C 124.11049 114.44373 122.77267 115.78155 121.11067 115.78155 L 57.110443 115.78155 C 55.448445 115.78155 54.110626 114.44373 54.110626 112.78173 L 54.110626 98.78155 C 54.110626 97.119552 55.448445 95.781734 57.110443 95.781734 z M 63.870237 128.77197 A 10 10 0 0 1 73.870143 138.77187 A 10 10 0 0 1 63.870237 148.77178 A 10 10 0 0 1 53.870331 138.77187 A 10 10 0 0 1 63.870237 128.77197 z M 89.110557 128.77197 A 10 10 0 0 1 99.110463 138.77187 A 10 10 0 0 1 89.110557 148.77178 A 10 10 0 0 1 79.11065 138.77187 A 10 10 0 0 1 89.110557 128.77197 z M 114.35088 128.77197 A 10 10 0 0 1 124.35078 138.77187 A 10 10 0 0 1 114.35088 148.77178 A 10 10 0 0 1 104.35097 138.77187 A 10 10 0 0 1 114.35088 128.77197 z " />
+  </g>
+</svg>
