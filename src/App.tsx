@@ -1,8 +1,21 @@
 import { Component } from 'react';
 import { StyleSheet, Pressable, Text, SafeAreaView, View } from 'react-native';
-import IcecastMetadataPlayer from 'icecast-metadata-player';
+import IcecastMetadataPlayer, { IcyMetadata } from 'icecast-metadata-player';
+import {
+	alarmIcon,
+	checkboxChecked,
+	checkboxUnchecked,
+	playIcon,
+	screensaverIcon,
+	settingsIcon,
+	stopIcon,
+} from './icons';
 
 const mainFontSize = 24;
+const alarmWidth = 140;
+const margin = 24;
+const fontColor = 'white';
+const opacityPressed = 0.2;
 
 const styles = StyleSheet.create({
 	container: {
@@ -12,109 +25,135 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		justifyContent: 'center',
-		backgroundColor: 'lightsteelblue',
+		backgroundColor: 'steelblue',
 	},
 	buttonContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		margin: 24,
+		margin: margin,
 	},
-	button: {
+	mediaButton: {
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 64,
 		width: 64,
 		borderRadius: 32,
-		marginHorizontal: 12,
-		backgroundColor: 'steelblue',
-	},
-	buttonText: {
-		fontSize: 24,
-		fontFamily: 'sans-serif',
-		color: 'white',
-		marginBottom: 4,
+		marginHorizontal: margin / 2,
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
 	},
 	streamTitle: {
 		height: 76,
-		margin: 24,
+		margin: margin,
 		alignContent: 'center',
 		justifyContent: 'center',
 	},
 	streamTitleText: {
-		fontSize: 32,
+		fontSize: 36,
 		textAlign: 'center',
-		color: 'white',
+		color: fontColor,
 	},
 	temperature: {
 		position: 'absolute',
 		bottom: 0,
 		right: 0,
 		fontSize: mainFontSize,
-		color: 'white',
-		margin: 24,
+		color: fontColor,
+		margin: margin,
 	},
 	timeOfDay: {
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
+		fontSize: 72,
+		fontWeight: 'bold',
+		textAlign: 'center',
+		color: fontColor,
+		margin: margin,
+	},
+	stationInfo: {
+		height: mainFontSize,
 		fontSize: mainFontSize,
-		color: 'white',
-		margin: 24,
+		textAlign: 'center',
+		color: fontColor,
+		opacity: 0.67,
+		margin: margin,
 	},
 	settings: {
 		position: 'absolute',
 		top: 0,
 		right: 0,
-		color: 'white',
-		margin: 18,
-	},
-	settingsText: {
-		fontSize: 32,
-		color: 'white',
+		margin: margin,
 	},
 	alarm: {
 		position: 'absolute',
 		flexDirection: 'row',
-		top: 0,
+		justifyContent: 'space-between',
+		bottom: 0,
 		left: 0,
-		margin: 24,
+		margin: margin,
+		width: alarmWidth,
 	},
 	alarmText: {
 		fontSize: mainFontSize,
-		color: 'white',
+		color: fontColor,
 	},
-	checkbox: {
-		height: 20,
-		width: 20,
-		marginLeft: 12,
+	screensaver: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		margin: margin,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: 70,
+	},
+	alarmBar: {
+		position: 'absolute',
+		left: 0,
+		bottom: 0,
+		marginLeft: margin,
+		marginBottom: margin - 2,
+		height: 2,
+		backgroundColor: fontColor,
+		opacity: 0.67,
 	},
 });
 
 const src = 'https://radio4.cdm-radio.com:18020/stream-mp3-Chill';
-const alarmTime = '06:31';
+
+const alarmTime = '06:30';
 const alarmDuration = 20;
 const latitude = 47.3492;
 const longitude = 8.5654;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface AppProps {}
 
 interface AppState {
 	temperature: number | undefined;
 	pressed: string;
 	streamTitle: string;
+	stationInfo: string;
 	timeOfDay: string;
-	checked: boolean;
+	checkedAlarm: boolean;
+	checkedScreensaver: boolean;
+	volume: number;
 }
 
 export default class App extends Component<AppProps, AppState> {
 	private intervalMain: NodeJS.Timer | undefined;
 	private player!: IcecastMetadataPlayer;
 	private withFadeIn = false;
-	private checkbox!: HTMLInputElement | null;
+	private stoppingAlarm = false;
 
 	constructor(props: AppProps) {
 		super(props);
-		this.state = { temperature: undefined, pressed: '', streamTitle: '', timeOfDay: '', checked: false };
+		this.state = {
+			temperature: undefined,
+			pressed: '',
+			streamTitle: '',
+			stationInfo: '',
+			timeOfDay: '',
+			checkedAlarm: false,
+			checkedScreensaver: false,
+			volume: 0,
+		};
 	}
 
 	public async componentDidMount(): Promise<void> {
@@ -128,22 +167,45 @@ export default class App extends Component<AppProps, AppState> {
 		// alarm volume
 		// screensaver on/off
 
-		this.setState({ checked: true });
+		this.setState({ checkedAlarm: true });
+		this.setState({ checkedScreensaver: true });
 
-		let codecInfo: any = undefined;
-		const onCodecUpdate = (codecInfo_: any) => {
-			if (!codecInfo) {
-				codecInfo = codecInfo_;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const onCodecUpdate = async (codecInfo: any) => {
+			if (!this.state.stationInfo) {
+				let host = '';
+				let location = '';
+				await fetch('https://radio4.cdm-radio.com:18020/status-json.xsl')
+					.then(async response => {
+						const stats = await response.json();
+						host = stats.icestats.host;
+						location = stats.icestats.location;
+					})
+					.catch();
+
+				this.setState({
+					stationInfo:
+						(host || '( No host )') +
+						'  ⋯  ' +
+						(location || '( Planet Earth )') +
+						'  ⋯  ' +
+						codecInfo.bitrate.toString() +
+						' bps, ' +
+						codecInfo.sampleRate.toString() +
+						' Hz',
+				});
 			}
 		};
 
-		const onError = (message: string, error: Error | undefined) => {
+		const onError = (message: string) => {
 			this.setState({ streamTitle: message.toString() });
 		};
 
 		this.player = new IcecastMetadataPlayer(src, {
-			onMetadata: (metadata: any) => {
-				this.setState({ streamTitle: metadata.StreamTitle });
+			onMetadata: (metadata: IcyMetadata) => {
+				if (!this.stoppingAlarm) {
+					this.setState({ streamTitle: metadata.StreamTitle || '( No metadata available )' });
+				}
 			},
 			onStreamStart: () => {
 				if (this.withFadeIn) {
@@ -158,10 +220,14 @@ export default class App extends Component<AppProps, AppState> {
 			metadataTypes: ['icy'],
 		});
 
+		// doesn't work
+		// this.player.addEventListener('codecupdate', onCodecUpdate, { once: true });
+
 		const stopAlarmTimeout = () => {
 			setTimeout(() => {
 				if (this.player.state !== 'stopped') {
 					this.setState({ streamTitle: '( Stopping alarm... )' });
+					this.stoppingAlarm = true;
 					this.stopStream(true);
 				}
 			}, alarmDuration * 60 * 1000);
@@ -218,7 +284,14 @@ export default class App extends Component<AppProps, AppState> {
 			if ([0, 15, 30, 45].includes(date.getMinutes())) {
 				setTemperature();
 			}
-		}, 30 * 1000);
+		}, 15 * 1000);
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const onClick = (e: any) => {
+			console.log(e);
+		};
+		window.addEventListener('click', onClick, true);
+		window.addEventListener('keypress', onClick, true);
 	}
 
 	public componentWillUnmount(): void {
@@ -232,13 +305,13 @@ export default class App extends Component<AppProps, AppState> {
 	}
 
 	private startStream = (withFadeIn: boolean) => {
-		this.setState({ pressed: 'PLAY' });
+		this.setState({ pressed: 'PLAY', streamTitle: '( Starting stream... )' });
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
 
 		if (withFadeIn) {
-			this.withFadeIn = withFadeIn;
+			this.withFadeIn = true;
 		} else {
 			this.player.audioElement.volume = 1;
 		}
@@ -247,7 +320,8 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private stopStream = (withFadeOut: boolean) => {
-		this.setState({ pressed: 'STOP' });
+		this.setState({ pressed: 'STOP', streamTitle: '( Stopping stream... )' });
+		this.withFadeIn = false;
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
@@ -256,19 +330,21 @@ export default class App extends Component<AppProps, AppState> {
 			this.fadeOut();
 		} else {
 			this.player.stop();
-			this.setState({ streamTitle: '' });
+			this.stoppingAlarm = false;
+			this.setState({ streamTitle: '', stationInfo: '', volume: 0 });
 		}
 	};
 
 	private fadeIn = () => {
 		this.player.audioElement.volume = 0;
 		const fadeInSeconds = 30;
-		const fadeInSteps = 30;
+		const fadeInSteps = fadeInSeconds * 5;
 		let i = 0;
 		const interval = setInterval(() => {
 			i++;
-			console.log(i);
-			this.player.audioElement.volume = i / fadeInSteps;
+			const volume = i / fadeInSteps;
+			this.player.audioElement.volume = volume;
+			this.setState({ volume: volume });
 			if (i >= fadeInSteps) {
 				clearInterval(interval);
 			}
@@ -278,18 +354,27 @@ export default class App extends Component<AppProps, AppState> {
 	private fadeOut = () => {
 		this.player.audioElement.volume = 1;
 		const fadeOutSeconds = 15;
-		const fadeOutSteps = 30;
+		const fadeOutSteps = fadeOutSeconds * 5;
 		let i = 0;
 		const interval = setInterval(() => {
 			i++;
-			console.log(i);
-			this.player.audioElement.volume = (fadeOutSteps - i) / fadeOutSteps;
+			const volume = (fadeOutSteps - i) / fadeOutSteps;
+			this.player.audioElement.volume = volume;
+			this.setState({ volume: volume });
 			if (i >= fadeOutSteps) {
 				clearInterval(interval);
 				this.player.stop();
-				this.setState({ streamTitle: '' });
+				this.stoppingAlarm = false;
+				this.setState({ streamTitle: '', stationInfo: '' });
 			}
 		}, (fadeOutSeconds * 1000) / fadeOutSteps);
+	};
+
+	private onPressScreensaver = () => {
+		this.setState({ pressed: 'SCREENSAVER' });
+		setTimeout(() => {
+			this.setState({ pressed: '' });
+		}, 250);
 	};
 
 	private onPressSettings = () => {
@@ -299,64 +384,97 @@ export default class App extends Component<AppProps, AppState> {
 		}, 250);
 	};
 
+	private onPressAlarm = () => {
+		this.setState({ pressed: 'ALARM' });
+		setTimeout(() => {
+			this.setState({ pressed: '' });
+		}, 250);
+	};
+
+	private onChangeScreensaverCheckbox = () => {
+		this.setState({ checkedScreensaver: !this.state.checkedScreensaver });
+	};
+
 	private onChangeAlarmCheckbox = () => {
-		this.setState({ checked: !this.state.checked });
+		this.setState({ checkedAlarm: !this.state.checkedAlarm });
 	};
 
 	public render(): JSX.Element | null {
+		const screensaverCheckbox = this.state.checkedScreensaver ? checkboxChecked : checkboxUnchecked;
+		const alarmCheckbox = this.state.checkedAlarm ? checkboxChecked : checkboxUnchecked;
+
 		return (
 			<SafeAreaView style={styles.container}>
+				<Text style={styles.stationInfo}>{this.state.stationInfo}</Text>
 				<View style={styles.streamTitle}>
 					<Text style={styles.streamTitleText}>{this.state.streamTitle || '( Music off )'}</Text>
 				</View>
 				<View style={styles.buttonContainer}>
 					<Pressable
 						style={[
-							styles.button,
+							styles.mediaButton,
 							{
-								opacity: this.state.pressed === 'PLAY' ? 0.5 : 1,
+								opacity: this.state.pressed === 'PLAY' ? opacityPressed : undefined,
 							},
 						]}
 						onPressIn={() => this.startStream(false)}
 					>
-						<Text style={[styles.buttonText, { marginLeft: 4 }]}>{'▶'}</Text>
+						{playIcon}
 					</Pressable>
 					<Pressable
 						style={[
-							styles.button,
+							styles.mediaButton,
 							{
-								opacity: this.state.pressed === 'STOP' ? 0.5 : 1,
+								opacity: this.state.pressed === 'STOP' ? opacityPressed : undefined,
 							},
 						]}
 						onPressIn={() => this.stopStream(false)}
 					>
-						<Text style={styles.buttonText}>{'◼'}</Text>
+						{stopIcon}
+					</Pressable>
+				</View>
+				<Text selectable={false} style={styles.timeOfDay}>
+					{this.state.timeOfDay}
+				</Text>
+				<View style={styles.screensaver}>
+					<Pressable
+						style={{
+							opacity: this.state.pressed === 'SCREENSAVER' ? opacityPressed : undefined,
+						}}
+						onPressIn={this.onPressScreensaver}
+					>
+						{screensaverIcon}
+					</Pressable>
+					<Pressable onPressIn={this.onChangeScreensaverCheckbox}>{screensaverCheckbox}</Pressable>
+				</View>
+				<View style={styles.settings}>
+					<Pressable
+						style={{
+							opacity: this.state.pressed === 'SETTINGS' ? opacityPressed : undefined,
+						}}
+						onPressIn={this.onPressSettings}
+					>
+						{settingsIcon}
 					</Pressable>
 				</View>
 				<View style={styles.alarm}>
-					<Text style={styles.alarmText}>{'Alarm - ' + alarmTime}</Text>
-					<input
-						ref={element => (this.checkbox = element)}
-						style={styles.checkbox}
-						type="checkbox"
-						id="checkbox"
-						checked={this.state.checked}
-						onChange={this.onChangeAlarmCheckbox}
-					/>
+					<Pressable
+						style={{
+							opacity: this.state.pressed === 'ALARM' ? opacityPressed : undefined,
+						}}
+						onPressIn={this.onPressAlarm}
+					>
+						{alarmIcon}
+					</Pressable>
+					<Text selectable={false} style={styles.alarmText}>
+						{alarmTime}
+					</Text>
+					<Pressable onPressIn={this.onChangeAlarmCheckbox}>{alarmCheckbox}</Pressable>
 				</View>
-				<Pressable
-					style={[
-						styles.settings,
-						{
-							opacity: this.state.pressed === 'SETTINGS' ? 0.5 : 1,
-						},
-					]}
-					onPressIn={this.onPressSettings}
-				>
-					<Text style={styles.settingsText}>{'⚙️'}</Text>
-				</Pressable>
-				<Text style={styles.temperature}>{this.state.temperature ? this.state.temperature + ' °C' : ''}</Text>
-				<Text style={styles.timeOfDay}>{this.state.timeOfDay}</Text>
+				<View style={[styles.alarmBar, { width: this.state.volume * alarmWidth }]} />
+				<Text selectable={false} style={styles.temperature}>
+					{this.state.temperature ? this.state.temperature + ' °C' : ''}
+				</Text>
 			</SafeAreaView>
 		);
 	}
