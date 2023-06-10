@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: MODALBACKGROUNDCOLOR,
 	},
-	containerSettingss: {
+	containerSettings: {
 		backgroundColor: APPCOLOR,
 		padding: MARGIN,
 	},
@@ -158,7 +158,7 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 		return (
 			<Modal animationType={'fade'} transparent={true} visible={true} onRequestClose={this.props.closeSettings}>
 				<View style={styles.container}>
-					<View style={styles.containerSettingss}>
+					<View style={styles.containerSettings}>
 						<View style={styles.settingsRow}>
 							<Text style={styles.label}>Stream URL</Text>
 							<TextInput

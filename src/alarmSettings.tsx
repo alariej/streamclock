@@ -19,7 +19,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const fontSize = 16;
-// const width = 260;
 const gridMargin = 4;
 const textPadding = 4;
 
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: MODALBACKGROUNDCOLOR,
 	},
-	containerSettingss: {
+	containerSettings: {
 		backgroundColor: APPCOLOR,
 		padding: MARGIN,
 	},
@@ -52,7 +51,6 @@ const styles = StyleSheet.create({
 	},
 	alarmInput: {
 		flex: 1,
-		// width: width,
 		fontSize: 16,
 		color: TEXTINPUTFONTCOLOR,
 		padding: textPadding,
@@ -142,7 +140,7 @@ export default class AlarmSettings extends Component<AlarmSettingsProps, AlarmSe
 				onRequestClose={this.props.closeAlarmSettings}
 			>
 				<View style={styles.container}>
-					<View style={styles.containerSettingss}>
+					<View style={styles.containerSettings}>
 						<View style={styles.settingsRow}>
 							<Text style={styles.label}>Alarm time</Text>
 							<TextInput
