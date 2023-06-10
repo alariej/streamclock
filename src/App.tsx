@@ -10,12 +10,36 @@ import {
 	settingsIcon,
 	stopIcon,
 } from './icons';
+import Settings from './settings';
+import {
+	ALARM,
+	ALARMSTORAGE,
+	ALARMTIME,
+	APPCOLOR,
+	BUTTONCOLOR,
+	DEFAULTALARMDURATION,
+	DEFAULTALARMTIME,
+	DEFAULTLATITUDE,
+	DEFAULTLONGITUDE,
+	DEFAULTSTREAMURL,
+	FONTCOLOR,
+	FONTSIZE,
+	LOC1LAT,
+	LOC1LON,
+	MARGIN,
+	OPACITYPRESSED,
+	PLAY,
+	SCREENSAVER,
+	SETTINGS,
+	SETTINGSSTORAGE,
+	STOP,
+	STREAMURL,
+	SettingsData,
+} from './uiconfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import AlarmSettings from './alarmSettings';
 
-const mainFontSize = 24;
 const alarmWidth = 140;
-const margin = 24;
-const fontColor = 'white';
-const opacityPressed = 0.2;
 
 const styles = StyleSheet.create({
 	container: {
@@ -25,61 +49,61 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		justifyContent: 'center',
-		backgroundColor: 'steelblue',
+		backgroundColor: APPCOLOR,
 	},
 	buttonContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		margin: margin,
+		margin: MARGIN,
 	},
 	mediaButton: {
 		alignItems: 'center',
 		justifyContent: 'center',
 		height: 64,
 		width: 64,
-		borderRadius: 32,
-		marginHorizontal: margin / 2,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		borderRadius: 64 / 2,
+		marginHorizontal: MARGIN / 2,
+		backgroundColor: BUTTONCOLOR,
 	},
 	streamTitle: {
 		height: 76,
-		margin: margin,
+		margin: MARGIN,
 		alignContent: 'center',
 		justifyContent: 'center',
 	},
 	streamTitleText: {
 		fontSize: 36,
 		textAlign: 'center',
-		color: fontColor,
+		color: FONTCOLOR,
 	},
 	temperature: {
 		position: 'absolute',
 		bottom: 0,
 		right: 0,
-		fontSize: mainFontSize,
-		color: fontColor,
-		margin: margin,
+		fontSize: FONTSIZE,
+		color: FONTCOLOR,
+		margin: MARGIN,
 	},
 	timeOfDay: {
-		fontSize: 72,
+		fontSize: 104,
 		fontWeight: 'bold',
 		textAlign: 'center',
-		color: fontColor,
-		margin: margin,
+		color: FONTCOLOR,
+		margin: MARGIN,
 	},
 	stationInfo: {
-		height: mainFontSize,
-		fontSize: mainFontSize,
+		height: FONTSIZE,
+		fontSize: FONTSIZE,
 		textAlign: 'center',
-		color: fontColor,
+		color: FONTCOLOR,
 		opacity: 0.67,
-		margin: margin,
+		margin: MARGIN,
 	},
 	settings: {
 		position: 'absolute',
 		top: 0,
 		right: 0,
-		margin: margin,
+		margin: MARGIN,
 	},
 	alarm: {
 		position: 'absolute',
@@ -87,18 +111,18 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		bottom: 0,
 		left: 0,
-		margin: margin,
+		margin: MARGIN,
 		width: alarmWidth,
 	},
 	alarmText: {
-		fontSize: mainFontSize,
-		color: fontColor,
+		fontSize: FONTSIZE,
+		color: FONTCOLOR,
 	},
 	screensaver: {
 		position: 'absolute',
 		top: 0,
 		left: 0,
-		margin: margin,
+		margin: MARGIN,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		width: 70,
@@ -107,20 +131,13 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		left: 0,
 		bottom: 0,
-		marginLeft: margin,
-		marginBottom: margin - 2,
+		marginLeft: MARGIN,
+		marginBottom: MARGIN - 2,
 		height: 2,
-		backgroundColor: fontColor,
+		backgroundColor: FONTCOLOR,
 		opacity: 0.67,
 	},
 });
-
-const src = 'https://radio4.cdm-radio.com:18020/stream-mp3-Chill';
-
-const alarmTime = '06:30';
-const alarmDuration = 20;
-const latitude = 47.3492;
-const longitude = 8.5654;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface AppProps {}
@@ -132,8 +149,11 @@ interface AppState {
 	stationInfo: string;
 	timeOfDay: string;
 	checkedAlarm: boolean;
+	alarmTime: string;
 	checkedScreensaver: boolean;
 	volume: number;
+	showSettings: boolean;
+	showAlarmSettings: boolean;
 }
 
 export default class App extends Component<AppProps, AppState> {
@@ -141,6 +161,13 @@ export default class App extends Component<AppProps, AppState> {
 	private player!: IcecastMetadataPlayer;
 	private withFadeIn = false;
 	private stoppingAlarm = false;
+	private streamUrl = '';
+	private latitude = '';
+	private longitude = '';
+	private alarmTime = '';
+	private alarmDuration = DEFAULTALARMDURATION;
+	private settings: SettingsData = {};
+	private alarmSettings: SettingsData = {};
 
 	constructor(props: AppProps) {
 		super(props);
@@ -153,142 +180,74 @@ export default class App extends Component<AppProps, AppState> {
 			checkedAlarm: false,
 			checkedScreensaver: false,
 			volume: 0,
+			showSettings: false,
+			showAlarmSettings: false,
+			alarmTime: '',
 		};
 	}
 
 	public async componentDidMount(): Promise<void> {
-		// here we will need to read all the data from local storage and set the
-		// values to the state variables
-		// streamUrl
-		// alarm on/off (checked)
-		// latitude / longitude
-		// alarm time
-		// alarm duration
-		// alarm volume
-		// screensaver on/off
+		await AsyncStorage.getItem(SETTINGSSTORAGE)
+			.then(settings => {
+				if (settings) {
+					this.settings = JSON.parse(settings);
+					this.streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
+					this.latitude = this.settings[LOC1LAT] || DEFAULTLATITUDE;
+					this.longitude = this.settings[LOC1LON] || DEFAULTLONGITUDE;
+				} else {
+					this.streamUrl = DEFAULTSTREAMURL;
+					this.latitude = DEFAULTLATITUDE;
+					this.longitude = DEFAULTLONGITUDE;
+				}
+			})
+			.catch();
 
+		await AsyncStorage.getItem(ALARMSTORAGE)
+			.then(alarmSettings => {
+				if (alarmSettings) {
+					this.alarmSettings = JSON.parse(alarmSettings);
+					this.alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
+				} else {
+					this.alarmTime = DEFAULTALARMTIME;
+				}
+			})
+			.catch();
+
+		this.setState({ alarmTime: this.alarmTime });
+
+		// temporary
+		// this needs to be saved in storage as well
 		this.setState({ checkedAlarm: true });
 		this.setState({ checkedScreensaver: true });
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const onCodecUpdate = async (codecInfo: any) => {
-			if (!this.state.stationInfo) {
-				let host = '';
-				let location = '';
-				await fetch('https://radio4.cdm-radio.com:18020/status-json.xsl')
-					.then(async response => {
-						const stats = await response.json();
-						host = stats.icestats.host;
-						location = stats.icestats.location;
-					})
-					.catch();
-
-				this.setState({
-					stationInfo:
-						(host || '( No host )') +
-						'  ⋯  ' +
-						(location || '( Planet Earth )') +
-						'  ⋯  ' +
-						codecInfo.bitrate.toString() +
-						' bps, ' +
-						codecInfo.sampleRate.toString() +
-						' Hz',
-				});
-			}
-		};
-
-		const onError = (message: string) => {
-			this.setState({ streamTitle: message.toString() });
-		};
-
-		this.player = new IcecastMetadataPlayer(src, {
-			onMetadata: (metadata: IcyMetadata) => {
-				if (!this.stoppingAlarm) {
-					this.setState({ streamTitle: metadata.StreamTitle || '( No metadata available )' });
-				}
-			},
-			onStreamStart: () => {
-				if (this.withFadeIn) {
-					this.fadeIn();
-				}
-			},
-			onStop: () => {
-				this.stopStream(false);
-			},
-			onCodecUpdate: onCodecUpdate,
-			onError: onError,
-			metadataTypes: ['icy'],
-		});
+		this.startPlayer();
 
 		// doesn't work
 		// this.player.addEventListener('codecupdate', onCodecUpdate, { once: true });
 
-		const stopAlarmTimeout = () => {
-			setTimeout(() => {
-				if (this.player.state !== 'stopped') {
-					this.setState({ streamTitle: '( Stopping alarm... )' });
-					this.stoppingAlarm = true;
-					this.stopStream(true);
-				}
-			}, alarmDuration * 60 * 1000);
-		};
-
-		// needs some additional logic for:
-		// alarm triggered
-		// alarm cancelled
-		// for volumes and loops to be consitents
-
-		const setTemperature = async () => {
-			const response = await fetch(
-				'https://api.open-meteo.com/v1/forecast?latitude=' +
-					latitude +
-					'&longitude=' +
-					longitude +
-					'&current_weather=true&forecast_days=1'
-			);
-
-			if (response.status === 200) {
-				const weatherInfo = await response.json();
-				const temperature = weatherInfo.current_weather.temperature;
-				this.setState({ temperature: temperature });
-			}
-		};
-
-		setTemperature();
-
-		const getTimeOfDay = (date: Date): string => {
-			const timeOfDay = date.toLocaleTimeString('en-US', {
-				hour: 'numeric',
-				minute: 'numeric',
-				hour12: false,
-			});
-
-			this.setState({ timeOfDay: timeOfDay });
-
-			return timeOfDay;
-		};
+		this.setTemperature();
 
 		const date = new Date();
-		getTimeOfDay(date);
+		this.getTimeOfDay(date);
 
 		this.intervalMain = setInterval(() => {
 			const date = new Date();
-			const timeOfDay = getTimeOfDay(date);
+			const timeOfDay = this.getTimeOfDay(date);
 
-			if (this.player.state !== 'playing' && alarmTime === timeOfDay) {
+			if (this.player.state !== 'playing' && this.alarmTime === timeOfDay) {
 				this.setState({ streamTitle: '( Starting alarm... )' });
 				this.startStream(true);
-				stopAlarmTimeout();
+				this.stopAlarmTimeout();
 			}
 
 			if ([0, 15, 30, 45].includes(date.getMinutes())) {
-				setTemperature();
+				this.setTemperature();
 			}
 		}, 15 * 1000);
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const onClick = (e: any) => {
-			console.log(e);
+			// console.log(e);
 		};
 		window.addEventListener('click', onClick, true);
 		window.addEventListener('keypress', onClick, true);
@@ -301,11 +260,75 @@ export default class App extends Component<AppProps, AppState> {
 		this.player.removeEventListener('codecupdate', null);
 		this.player.removeEventListener('metadata', null);
 		this.player.removeEventListener('streamstart', null);
-		this.player.removeEventListener('stop', null);
 	}
 
+	private startPlayer = () => {
+		this.player = new IcecastMetadataPlayer(this.streamUrl, {
+			onMetadata: this.onMetadata,
+			onStreamStart: this.onStreamStart,
+			onCodecUpdate: this.onCodecUpdate,
+			onError: this.onError,
+			metadataTypes: ['icy'],
+		});
+	};
+
+	private onMetadata = (metadata: IcyMetadata) => {
+		if (!this.stoppingAlarm) {
+			this.setState({ streamTitle: metadata.StreamTitle || '( No metadata available )' });
+		}
+	};
+
+	private onStreamStart = () => {
+		if (this.withFadeIn) {
+			this.fadeIn();
+		}
+	};
+
+	private onError = (message: string, error?: Error): void => {
+		this.setState({ streamTitle: '( ' + (error?.message || message.toString()) + ' )' });
+	};
+
+	private getStatsUrl = (): string => {
+		const urlMatch = this.streamUrl.match(/.*\//);
+		const baseUrl = urlMatch?.length ? urlMatch[0] : '';
+		return baseUrl ? baseUrl + 'status-json.xsl' : '';
+	};
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	private onCodecUpdate = async (codecInfo: any) => {
+		if (!this.state.stationInfo) {
+			const statsUrl = this.getStatsUrl();
+			if (!statsUrl) {
+				this.setState({ stationInfo: '   ' });
+				return;
+			}
+
+			let host = '';
+			let location = '';
+			await fetch(statsUrl)
+				.then(async response => {
+					const stats = await response.json();
+					host = stats.icestats.host;
+					location = stats.icestats.location;
+				})
+				.catch();
+
+			this.setState({
+				stationInfo:
+					(host || '( No host )') +
+					'  ⋯  ' +
+					(location || '( Planet Earth )') +
+					'  ⋯  ' +
+					codecInfo.bitrate.toString() +
+					' bps, ' +
+					codecInfo.sampleRate.toString() +
+					' Hz',
+			});
+		}
+	};
+
 	private startStream = (withFadeIn: boolean) => {
-		this.setState({ pressed: 'PLAY', streamTitle: '( Starting stream... )' });
+		this.setState({ pressed: PLAY, streamTitle: '( Starting stream... )' });
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
@@ -320,7 +343,7 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private stopStream = (withFadeOut: boolean) => {
-		this.setState({ pressed: 'STOP', streamTitle: '( Stopping stream... )' });
+		this.setState({ pressed: STOP, streamTitle: '( Stopping stream... )' });
 		this.withFadeIn = false;
 		setTimeout(() => {
 			this.setState({ pressed: '' });
@@ -370,22 +393,61 @@ export default class App extends Component<AppProps, AppState> {
 		}, (fadeOutSeconds * 1000) / fadeOutSteps);
 	};
 
+	private setTemperature = async () => {
+		const response = await fetch(
+			'https://api.open-meteo.com/v1/forecast?latitude=' +
+				this.latitude +
+				'&longitude=' +
+				this.longitude +
+				'&current_weather=true&forecast_days=1'
+		);
+
+		if (response.status === 200) {
+			const weatherInfo = await response.json();
+			const temperature = weatherInfo.current_weather.temperature;
+			this.setState({ temperature: temperature });
+		}
+	};
+
+	private getTimeOfDay = (date: Date): string => {
+		const timeOfDay = date.toLocaleTimeString('en-US', {
+			hour: 'numeric',
+			minute: 'numeric',
+			hour12: false,
+		});
+
+		this.setState({ timeOfDay: timeOfDay });
+
+		return timeOfDay;
+	};
+
+	private stopAlarmTimeout = () => {
+		setTimeout(() => {
+			if (this.player.state !== 'stopped') {
+				this.setState({ streamTitle: '( Stopping alarm... )' });
+				this.stoppingAlarm = true;
+				this.stopStream(true);
+			}
+		}, this.alarmDuration * 60 * 1000);
+	};
+
 	private onPressScreensaver = () => {
-		this.setState({ pressed: 'SCREENSAVER' });
+		this.setState({ pressed: SCREENSAVER });
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
+		// launch screensaver
 	};
 
 	private onPressSettings = () => {
-		this.setState({ pressed: 'SETTINGS' });
+		this.setState({ showSettings: true, pressed: SETTINGS });
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
 	};
 
 	private onPressAlarm = () => {
-		this.setState({ pressed: 'ALARM' });
+		this.setState({ showAlarmSettings: true, pressed: ALARM });
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
@@ -399,7 +461,73 @@ export default class App extends Component<AppProps, AppState> {
 		this.setState({ checkedAlarm: !this.state.checkedAlarm });
 	};
 
+	private closeSettings = async () => {
+		await AsyncStorage.getItem(SETTINGSSTORAGE)
+			.then(settings => {
+				if (settings) {
+					this.settings = JSON.parse(settings);
+					const streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
+					const latitude = this.settings[LOC1LAT] || DEFAULTLATITUDE;
+					const longitude = this.settings[LOC1LON] || DEFAULTLONGITUDE;
+
+					if (streamUrl !== this.streamUrl) {
+						this.streamUrl = streamUrl;
+						const playerState = this.player.state;
+						if (playerState === 'playing') {
+							this.stopStream(false);
+						}
+						this.player.stop();
+						this.player.removeEventListener('error', null);
+						this.player.removeEventListener('codecupdate', null);
+						this.player.removeEventListener('metadata', null);
+						this.player.removeEventListener('streamstart', null);
+						this.startPlayer();
+						if (playerState === 'playing') {
+							this.startStream(false);
+						}
+					}
+
+					if (latitude !== this.latitude || longitude !== this.longitude) {
+						this.latitude = latitude;
+						this.longitude = longitude;
+						this.setTemperature();
+					}
+				}
+			})
+			.catch();
+
+		this.setState({ showSettings: false });
+	};
+
+	private closeAlarmSettings = async () => {
+		await AsyncStorage.getItem(ALARMSTORAGE)
+			.then(alarmSettings => {
+				if (alarmSettings) {
+					this.alarmSettings = JSON.parse(alarmSettings);
+					const alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
+
+					if (alarmTime !== this.alarmTime) {
+						this.alarmTime = alarmTime;
+						this.setState({ alarmTime: alarmTime });
+					}
+				}
+			})
+			.catch();
+
+		this.setState({ showAlarmSettings: false });
+	};
+
 	public render(): JSX.Element | null {
+		let settingsDialog;
+		if (this.state.showSettings) {
+			settingsDialog = <Settings closeSettings={this.closeSettings} />;
+		}
+
+		let alarmDialog;
+		if (this.state.showAlarmSettings) {
+			alarmDialog = <AlarmSettings closeAlarmSettings={this.closeAlarmSettings} />;
+		}
+
 		const screensaverCheckbox = this.state.checkedScreensaver ? checkboxChecked : checkboxUnchecked;
 		const alarmCheckbox = this.state.checkedAlarm ? checkboxChecked : checkboxUnchecked;
 
@@ -414,7 +542,7 @@ export default class App extends Component<AppProps, AppState> {
 						style={[
 							styles.mediaButton,
 							{
-								opacity: this.state.pressed === 'PLAY' ? opacityPressed : undefined,
+								opacity: this.state.pressed === PLAY ? OPACITYPRESSED : undefined,
 							},
 						]}
 						onPressIn={() => this.startStream(false)}
@@ -425,7 +553,7 @@ export default class App extends Component<AppProps, AppState> {
 						style={[
 							styles.mediaButton,
 							{
-								opacity: this.state.pressed === 'STOP' ? opacityPressed : undefined,
+								opacity: this.state.pressed === STOP ? OPACITYPRESSED : undefined,
 							},
 						]}
 						onPressIn={() => this.stopStream(false)}
@@ -439,7 +567,7 @@ export default class App extends Component<AppProps, AppState> {
 				<View style={styles.screensaver}>
 					<Pressable
 						style={{
-							opacity: this.state.pressed === 'SCREENSAVER' ? opacityPressed : undefined,
+							opacity: this.state.pressed === SCREENSAVER ? OPACITYPRESSED : undefined,
 						}}
 						onPressIn={this.onPressScreensaver}
 					>
@@ -450,7 +578,7 @@ export default class App extends Component<AppProps, AppState> {
 				<View style={styles.settings}>
 					<Pressable
 						style={{
-							opacity: this.state.pressed === 'SETTINGS' ? opacityPressed : undefined,
+							opacity: this.state.pressed === SETTINGS ? OPACITYPRESSED : undefined,
 						}}
 						onPressIn={this.onPressSettings}
 					>
@@ -460,14 +588,14 @@ export default class App extends Component<AppProps, AppState> {
 				<View style={styles.alarm}>
 					<Pressable
 						style={{
-							opacity: this.state.pressed === 'ALARM' ? opacityPressed : undefined,
+							opacity: this.state.pressed === ALARM ? OPACITYPRESSED : undefined,
 						}}
 						onPressIn={this.onPressAlarm}
 					>
 						{alarmIcon}
 					</Pressable>
 					<Text selectable={false} style={styles.alarmText}>
-						{alarmTime}
+						{this.state.alarmTime}
 					</Text>
 					<Pressable onPressIn={this.onChangeAlarmCheckbox}>{alarmCheckbox}</Pressable>
 				</View>
@@ -475,6 +603,8 @@ export default class App extends Component<AppProps, AppState> {
 				<Text selectable={false} style={styles.temperature}>
 					{this.state.temperature ? this.state.temperature + ' °C' : ''}
 				</Text>
+				{settingsDialog}
+				{alarmDialog}
 			</SafeAreaView>
 		);
 	}
