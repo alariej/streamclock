@@ -40,6 +40,10 @@ export const SETTINGS = 'SETTINGS';
 export const LOCATIONIDPLACEHOLDER = 'ID (2-3 letters)';
 export const LATITUDEPLACEHOLDER = 'Latitude';
 export const LONGITUDEPLACEHOLDER = 'Longitude';
+export const ALARMONOFF = 'alarm_onoff';
+export const SCREENSAVERONOFF = 'screensaver_onoff';
+export const ON = 'on';
+export const OFF = 'off';
 
 export interface SettingsData {
 	[key: string]: string;

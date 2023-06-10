@@ -13,6 +13,7 @@ import {
 import Settings from './settings';
 import {
 	ALARM,
+	ALARMONOFF,
 	ALARMSTORAGE,
 	ALARMTIME,
 	APPCOLOR,
@@ -27,9 +28,12 @@ import {
 	LOC1LAT,
 	LOC1LON,
 	MARGIN,
+	OFF,
+	ON,
 	OPACITYPRESSED,
 	PLAY,
 	SCREENSAVER,
+	SCREENSAVERONOFF,
 	SETTINGS,
 	SETTINGSSTORAGE,
 	STOP,
@@ -215,10 +219,31 @@ export default class App extends Component<AppProps, AppState> {
 
 		this.setState({ alarmTime: this.alarmTime });
 
-		// temporary
-		// this needs to be saved in storage as well
-		this.setState({ checkedAlarm: true });
-		this.setState({ checkedScreensaver: true });
+		let checkedAlarm = true;
+		await AsyncStorage.getItem(ALARMONOFF)
+			.then(alarmOnOff => {
+				if (alarmOnOff) {
+					checkedAlarm = alarmOnOff === ON;
+				} else {
+					checkedAlarm = true;
+				}
+			})
+			.catch();
+
+		this.setState({ checkedAlarm: checkedAlarm });
+
+		let checkedScreensaver = true;
+		await AsyncStorage.getItem(SCREENSAVERONOFF)
+			.then(screensaverOnOff => {
+				if (screensaverOnOff) {
+					checkedScreensaver = screensaverOnOff === ON;
+				} else {
+					checkedScreensaver = true;
+				}
+			})
+			.catch();
+
+		this.setState({ checkedScreensaver: checkedScreensaver });
 
 		this.startPlayer();
 
@@ -454,10 +479,14 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private onChangeScreensaverCheckbox = () => {
+		const screensaverOnOff = this.state.checkedScreensaver ? OFF : ON;
+		AsyncStorage.setItem(SCREENSAVERONOFF, screensaverOnOff);
 		this.setState({ checkedScreensaver: !this.state.checkedScreensaver });
 	};
 
 	private onChangeAlarmCheckbox = () => {
+		const alarmOnOff = this.state.checkedAlarm ? OFF : ON;
+		AsyncStorage.setItem(ALARMONOFF, alarmOnOff);
 		this.setState({ checkedAlarm: !this.state.checkedAlarm });
 	};
 
