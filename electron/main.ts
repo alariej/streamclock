@@ -26,7 +26,7 @@ function createWindow() {
 		frame: true,
 		movable: true,
 		backgroundColor: '#fff',
-		icon: path.join(process.env.PUBLIC, 'logo.svg'),
+		icon: path.join(process.env.PUBLIC, 'logo.png'),
 		webPreferences: {
 			autoplayPolicy: 'no-user-gesture-required',
 			preload: path.join(__dirname, 'preload.js'),
