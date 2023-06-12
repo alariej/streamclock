@@ -716,6 +716,7 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private closeScreenSaver = () => {
+		document?.exitFullscreen().catch(() => null);
 		this.setState({ isScreensaver: false });
 	};
 
