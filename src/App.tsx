@@ -588,6 +588,19 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private onPressScreensaver = async () => {
+		/* 
+		const fullscreenView = document.getElementById('fullscreenview');
+		fullscreenView?.requestFullscreen().catch(() => null);
+		*/
+
+		// TODO: there is a race condition here
+		// the font size on the screensaver is only correct
+		// because of the await in the settemperature call
+		// otherwise font size is for the non-fullscreen window
+
+		const { ipcRenderer } = window.require('electron');
+		ipcRenderer.send('enter-fullscreen');
+
 		if (this.location2) {
 			await this.setTemperatureScreenSaver();
 		}
@@ -709,8 +722,6 @@ export default class App extends Component<AppProps, AppState> {
 	private onScreensaverLayout = (e: LayoutChangeEvent) => {
 		this.screensaverHeight = e.nativeEvent.layout.height;
 		this.screensaverWidth = e.nativeEvent.layout.width;
-		const fullscreenView = document.getElementById('fullscreenview');
-		fullscreenView?.requestFullscreen().catch(() => null);
 	};
 
 	public render(): JSX.Element | null {
