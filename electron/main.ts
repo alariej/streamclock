@@ -48,14 +48,9 @@ function createWindow() {
 		event.returnValue = 'Success';
 	});
 
-	/*   
-	win.webContents.on('ipc-message', () => {
-    win?.webContents
-		.executeJavaScript('document.getElementById("fullscreenview").requestFullScreen()', true)
-		.then(console.log)
-		.catch(console.log);
+	ipcMain.on('enter-fullscreen', () => {
+		win?.webContents.executeJavaScript('document.getElementById("fullscreenview").requestFullscreen()', true);
 	});
-  */
 
 	if (VITE_DEV_SERVER_URL) {
 		win.loadURL(VITE_DEV_SERVER_URL);
