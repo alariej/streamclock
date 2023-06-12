@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { StyleSheet, Pressable, Text, SafeAreaView, View, LayoutChangeEvent } from 'react-native';
+import { StyleSheet, Pressable, Text, View, LayoutChangeEvent } from 'react-native';
 import IcecastMetadataPlayer, { IcyMetadata } from 'icecast-metadata-player';
 import {
 	alarmIcon,
@@ -61,6 +61,13 @@ const streamTitleHeight = 48;
 
 const styles = StyleSheet.create({
 	container: {
+		position: 'absolute',
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+	},
+	containerApp: {
 		position: 'absolute',
 		top: 0,
 		bottom: 0,
@@ -739,6 +746,7 @@ export default class App extends Component<AppProps, AppState> {
 		const screensaverCheckbox = this.state.checkedScreensaver ? checkboxChecked : checkboxUnchecked;
 		const alarmCheckbox = this.state.checkedAlarm ? checkboxChecked : checkboxUnchecked;
 
+		let displayView;
 		if (this.state.isScreensaver) {
 			const numLocations = 1;
 			const fontSizeTime = this.screensaverWidth / 16;
@@ -855,13 +863,8 @@ export default class App extends Component<AppProps, AppState> {
 				);
 			}
 
-			return (
-				<View
-					id={'fullscreenview'}
-					onLayout={this.onScreensaverLayout}
-					style={styles.containerScreensaver}
-					onPointerDown={this.closeScreenSaver}
-				>
+			displayView = (
+				<View style={styles.containerScreensaver} onPointerDown={this.closeScreenSaver}>
 					<View style={styles.streamTitleScreensaver}>
 						<Text numberOfLines={1} style={[styles.streamTitleTextScreensaver, { fontSize: fontSizeSong }]}>
 							{this.streamTitlePos === 'top' ? this.state.streamTitle : ''}
@@ -875,85 +878,91 @@ export default class App extends Component<AppProps, AppState> {
 					</View>
 				</View>
 			);
+		} else {
+			displayView = (
+				<View style={styles.containerApp}>
+					<Text style={styles.stationInfo}>{this.state.stationInfo}</Text>
+					<View style={styles.streamTitle}>
+						<Text style={styles.streamTitleText}>{this.state.streamTitle || '( Music off )'}</Text>
+					</View>
+					<View style={styles.buttonContainer}>
+						<Pressable
+							style={[
+								styles.mediaButton,
+								{
+									opacity: this.state.pressed === PLAY ? OPACITYPRESSED : undefined,
+								},
+							]}
+							onPressIn={() => this.startStream(false)}
+						>
+							{playIcon}
+						</Pressable>
+						<Pressable
+							style={[
+								styles.mediaButton,
+								{
+									opacity: this.state.pressed === STOP ? OPACITYPRESSED : undefined,
+								},
+							]}
+							onPressIn={() => this.stopStream(false)}
+						>
+							{stopIcon}
+						</Pressable>
+					</View>
+					<Text selectable={false} style={styles.timeOfDay}>
+						{this.state.timeOfDay}
+					</Text>
+					<View style={styles.screensaver}>
+						<Pressable
+							style={{
+								opacity: this.state.pressed === SCREENSAVER ? OPACITYPRESSED : undefined,
+							}}
+							onPressIn={this.onPressScreensaver}
+						>
+							{screensaverIcon}
+						</Pressable>
+						<Pressable disabled={true} style={{ opacity: 0 }} onPressIn={this.onChangeScreensaverCheckbox}>
+							{screensaverCheckbox}
+						</Pressable>
+					</View>
+					<View style={styles.settings}>
+						<Pressable
+							style={{
+								opacity: this.state.pressed === SETTINGS ? OPACITYPRESSED : undefined,
+							}}
+							onPressIn={this.onPressSettings}
+						>
+							{settingsIcon}
+						</Pressable>
+					</View>
+					<View style={styles.alarm}>
+						<Pressable
+							style={{
+								opacity: this.state.pressed === ALARM ? OPACITYPRESSED : undefined,
+							}}
+							onPressIn={this.onPressAlarm}
+						>
+							{alarmIcon}
+						</Pressable>
+						<Text selectable={false} style={styles.alarmText}>
+							{this.state.alarmTime}
+						</Text>
+						<Pressable onPressIn={this.onChangeAlarmCheckbox}>{alarmCheckbox}</Pressable>
+					</View>
+					<View style={[styles.alarmBar, { width: this.state.volume * alarmWidth }]} />
+					<Text selectable={false} style={styles.temperature}>
+						{this.state.temperature && Number(this.state.temperature) ? this.state.temperature + ' °C' : ''}
+					</Text>
+					{settingsDialog}
+					{alarmDialog}
+				</View>
+			);
 		}
 
 		return (
-			<SafeAreaView style={styles.container}>
-				<Text style={styles.stationInfo}>{this.state.stationInfo}</Text>
-				<View style={styles.streamTitle}>
-					<Text style={styles.streamTitleText}>{this.state.streamTitle || '( Music off )'}</Text>
-				</View>
-				<View style={styles.buttonContainer}>
-					<Pressable
-						style={[
-							styles.mediaButton,
-							{
-								opacity: this.state.pressed === PLAY ? OPACITYPRESSED : undefined,
-							},
-						]}
-						onPressIn={() => this.startStream(false)}
-					>
-						{playIcon}
-					</Pressable>
-					<Pressable
-						style={[
-							styles.mediaButton,
-							{
-								opacity: this.state.pressed === STOP ? OPACITYPRESSED : undefined,
-							},
-						]}
-						onPressIn={() => this.stopStream(false)}
-					>
-						{stopIcon}
-					</Pressable>
-				</View>
-				<Text selectable={false} style={styles.timeOfDay}>
-					{this.state.timeOfDay}
-				</Text>
-				<View style={styles.screensaver}>
-					<Pressable
-						style={{
-							opacity: this.state.pressed === SCREENSAVER ? OPACITYPRESSED : undefined,
-						}}
-						onPressIn={this.onPressScreensaver}
-					>
-						{screensaverIcon}
-					</Pressable>
-					<Pressable disabled={true} style={{ opacity: 0 }} onPressIn={this.onChangeScreensaverCheckbox}>
-						{screensaverCheckbox}
-					</Pressable>
-				</View>
-				<View style={styles.settings}>
-					<Pressable
-						style={{
-							opacity: this.state.pressed === SETTINGS ? OPACITYPRESSED : undefined,
-						}}
-						onPressIn={this.onPressSettings}
-					>
-						{settingsIcon}
-					</Pressable>
-				</View>
-				<View style={styles.alarm}>
-					<Pressable
-						style={{
-							opacity: this.state.pressed === ALARM ? OPACITYPRESSED : undefined,
-						}}
-						onPressIn={this.onPressAlarm}
-					>
-						{alarmIcon}
-					</Pressable>
-					<Text selectable={false} style={styles.alarmText}>
-						{this.state.alarmTime}
-					</Text>
-					<Pressable onPressIn={this.onChangeAlarmCheckbox}>{alarmCheckbox}</Pressable>
-				</View>
-				<View style={[styles.alarmBar, { width: this.state.volume * alarmWidth }]} />
-				<Text selectable={false} style={styles.temperature}>
-					{this.state.temperature && Number(this.state.temperature) ? this.state.temperature + ' °C' : ''}
-				</Text>
-				{settingsDialog}
-				{alarmDialog}
-			</SafeAreaView>
+			<View style={styles.container} id={'fullscreenview'} onLayout={this.onScreensaverLayout}>
+				{displayView}
+			</View>
 		);
 	}
 }
