@@ -15,6 +15,8 @@ import {
 	TEXTINPUTFONTCOLOR,
 	ALARMTIME,
 	DEFAULTALARMTIME,
+	ALARMVOLUME,
+	DEFAULTALARMVOLUME,
 } from './uiconfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
 	label: {
 		fontSize: fontSize,
 		color: FONTCOLOR,
-		width: 120,
+		width: 160,
 		textAlign: 'right',
 		marginRight: 8,
 		padding: 4,
@@ -150,6 +152,17 @@ export default class AlarmSettings extends Component<AlarmSettingsProps, AlarmSe
 								onChangeText={text => this.onChangeText(ALARMTIME, text)}
 								key={this.state?.alarmSettings[ALARMTIME] || DEFAULTALARMTIME}
 								defaultValue={this.state?.alarmSettings[ALARMTIME] || DEFAULTALARMTIME}
+							/>
+						</View>
+						<View style={styles.settingsRow}>
+							<Text style={styles.label}>System volume (%)</Text>
+							<TextInput
+								style={styles.alarmInput}
+								spellCheck={false}
+								autoFocus={true}
+								onChangeText={text => this.onChangeText(ALARMVOLUME, text)}
+								key={this.state?.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME}
+								defaultValue={this.state?.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME}
 							/>
 						</View>
 						<View style={styles.buttonContainer}>

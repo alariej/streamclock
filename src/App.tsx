@@ -16,10 +16,12 @@ import {
 	ALARMONOFF,
 	ALARMSTORAGE,
 	ALARMTIME,
+	ALARMVOLUME,
 	APPCOLOR,
 	BUTTONCOLOR,
 	DEFAULTALARMDURATION,
 	DEFAULTALARMTIME,
+	DEFAULTALARMVOLUME,
 	DEFAULTLATITUDE,
 	DEFAULTLOCATION,
 	DEFAULTLONGITUDE,
@@ -52,7 +54,7 @@ import {
 	SettingsData,
 } from './uiconfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AlarmSettings from './alarmSettings';
+import AlarmSettings from './settingsAlarm';
 
 const alarmWidth = 140;
 const streamTitleHeight = 48;
@@ -236,6 +238,7 @@ export default class App extends Component<AppProps, AppState> {
 	private longitude4 = '';
 	private temperature4 = '';
 	private alarmTime = '';
+	private alarmVolume = '';
 	private alarmDuration = DEFAULTALARMDURATION;
 	private settings: SettingsData = {};
 	private alarmSettings: SettingsData = {};
@@ -296,8 +299,10 @@ export default class App extends Component<AppProps, AppState> {
 				if (alarmSettings) {
 					this.alarmSettings = JSON.parse(alarmSettings);
 					this.alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
+					this.alarmVolume = this.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME;
 				} else {
 					this.alarmTime = DEFAULTALARMTIME;
+					this.alarmVolume = DEFAULTALARMVOLUME;
 				}
 			})
 			.catch();
@@ -478,8 +483,9 @@ export default class App extends Component<AppProps, AppState> {
 
 	private resetMainVolume = async () => {
 		const { ipcRenderer } = window.require('electron');
-		await ipcRenderer.sendSync('reset-main-volume', 50);	
-	}
+		const volume = Number(this.alarmVolume) || Number(DEFAULTALARMVOLUME);
+		await ipcRenderer.sendSync('reset-main-volume', volume);
+	};
 
 	private fadeIn = () => {
 		this.player.audioElement.volume = 0;
@@ -680,10 +686,14 @@ export default class App extends Component<AppProps, AppState> {
 				if (alarmSettings) {
 					this.alarmSettings = JSON.parse(alarmSettings);
 					const alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
+					const alarmVolume = this.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME;
 
 					if (alarmTime !== this.alarmTime) {
 						this.alarmTime = alarmTime;
 						this.setState({ alarmTime: alarmTime });
+					}
+					if (alarmVolume !== this.alarmVolume) {
+						this.alarmVolume = alarmVolume;
 					}
 				}
 			})
