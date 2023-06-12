@@ -371,6 +371,7 @@ export default class App extends Component<AppProps, AppState> {
 		this.player.removeEventListener('codecupdate', null);
 		this.player.removeEventListener('metadata', null);
 		this.player.removeEventListener('streamstart', null);
+		this.player.removeEventListener('stop', null);
 	}
 
 	private startPlayer = () => {
@@ -379,8 +380,13 @@ export default class App extends Component<AppProps, AppState> {
 			onStreamStart: this.onStreamStart,
 			onCodecUpdate: this.onCodecUpdate,
 			onError: this.onError,
+			onStop: this.onStop,
 			metadataTypes: ['icy'],
 		});
+	};
+
+	private onStop = () => {
+		this.setState({ streamTitle: '', stationInfo: '' });
 	};
 
 	private onMetadata = (metadata: IcyMetadata) => {
