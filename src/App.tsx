@@ -345,6 +345,7 @@ export default class App extends Component<AppProps, AppState> {
 			const timeOfDay = this.getTimeOfDay(date);
 
 			if (this.player.state !== 'playing' && this.alarmTime === timeOfDay) {
+				this.resetMainVolume();
 				this.setState({ streamTitle: '( Starting alarm... )' });
 				this.startStream(true);
 				this.stopAlarmTimeout();
@@ -468,6 +469,11 @@ export default class App extends Component<AppProps, AppState> {
 			this.setState({ streamTitle: '', stationInfo: '', volume: 0 });
 		}
 	};
+
+	private resetMainVolume = async () => {
+		const { ipcRenderer } = window.require('electron');
+		await ipcRenderer.sendSync('reset-main-volume', 50);	
+	}
 
 	private fadeIn = () => {
 		this.player.audioElement.volume = 0;

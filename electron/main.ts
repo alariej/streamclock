@@ -1,5 +1,7 @@
 import { app, BrowserWindow } from 'electron';
+import { ipcMain } from 'electron';
 import path from 'node:path';
+import * as loudness from '@matthey/loudness';
 
 // The built directory structure
 //
@@ -28,6 +30,8 @@ function createWindow() {
 		backgroundColor: '#fff',
 		icon: path.join(process.env.PUBLIC, 'logo.png'),
 		webPreferences: {
+			nodeIntegration: true,
+			contextIsolation: false,
 			autoplayPolicy: 'no-user-gesture-required',
 			preload: path.join(__dirname, 'preload.js'),
 		},
@@ -36,6 +40,12 @@ function createWindow() {
 	// Test active push message to Renderer-process.
 	win.webContents.on('did-finish-load', () => {
 		win?.webContents.send('main-process-message', new Date().toLocaleString());
+	});
+
+	ipcMain.on('reset-main-volume', (event, volume) => {
+		loudness.setVolume(volume);
+		loudness.setMuted(false);
+		event.returnValue = 'Success';
 	});
 
 	/*   
