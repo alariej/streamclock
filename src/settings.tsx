@@ -36,6 +36,7 @@ import {
 	TEXTINPUTFONTCOLOR,
 } from './uiconfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import packageJson from '../package.json';
 
 const fontSize = 16;
 const width = 560;
@@ -68,6 +69,15 @@ const styles = StyleSheet.create({
 		textAlign: 'right',
 		marginRight: 8,
 		padding: 4,
+	},
+	title: {
+		flex: 1,
+		fontSize: fontSize,
+		fontWeight: 'bold',
+		color: FONTCOLOR,
+		textAlign: 'center',
+		padding: 4,
+		marginBottom: MARGIN,
 	},
 	urlInput: {
 		width: width,
@@ -159,6 +169,9 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 			<Modal animationType={'fade'} transparent={true} visible={true} onRequestClose={this.props.closeSettings}>
 				<View style={styles.container}>
 					<View style={styles.containerSettings}>
+						<View style={styles.settingsRow}>
+							<Text style={styles.title}>{packageJson.displayName + '   v' + packageJson.version}</Text>
+						</View>
 						<View style={styles.settingsRow}>
 							<Text style={styles.label}>Stream URL</Text>
 							<TextInput
