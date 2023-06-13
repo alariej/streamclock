@@ -42,10 +42,9 @@ function createWindow() {
 		win?.webContents.send('main-process-message', new Date().toLocaleString());
 	});
 
-	ipcMain.on('reset-main-volume', (event, volume) => {
+	ipcMain.on('reset-main-volume', (_event, volume) => {
 		loudness.setVolume(volume);
 		loudness.setMuted(false);
-		event.returnValue = 'Success';
 	});
 
 	ipcMain.on('enter-fullscreen', () => {
