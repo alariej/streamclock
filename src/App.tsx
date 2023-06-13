@@ -497,10 +497,10 @@ export default class App extends Component<AppProps, AppState> {
 		}
 	};
 
-	private resetMainVolume = async () => {
+	private resetMainVolume = () => {
 		const { ipcRenderer } = window.require('electron');
 		const volume = Number(this.alarmVolume) || Number(DEFAULTALARMVOLUME);
-		await ipcRenderer.sendSync('reset-main-volume', volume);
+		ipcRenderer.send('reset-main-volume', volume);
 	};
 
 	private fadeIn = () => {
