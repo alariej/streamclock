@@ -46,6 +46,7 @@ export const ALARMONOFF = 'alarm_onoff';
 export const SCREENSAVERONOFF = 'screensaver_onoff';
 export const ON = 'on';
 export const OFF = 'off';
+export const SCREENSAVERDELAY = 60;
 
 export interface SettingsData {
 	[key: string]: string;

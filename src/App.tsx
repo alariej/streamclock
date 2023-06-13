@@ -46,6 +46,7 @@ import {
 	OPACITYPRESSED,
 	PLAY,
 	SCREENSAVER,
+	SCREENSAVERDELAY,
 	SCREENSAVERONOFF,
 	SETTINGS,
 	SETTINGSSTORAGE,
@@ -255,6 +256,7 @@ export default class App extends Component<AppProps, AppState> {
 	private timeOfDay = '';
 	private top = 0;
 	private left = 0;
+	private timeoutScreensaver: NodeJS.Timer | undefined;
 
 	constructor(props: AppProps) {
 		super(props);
@@ -368,9 +370,15 @@ export default class App extends Component<AppProps, AppState> {
 			}
 		}, 15 * 1000);
 
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		if (this.state.checkedScreensaver) {
+			this.screensaverCountdown();
+		}
+
 		const onClick = () => {
-			// console.log(e);
+			if (this.state.checkedScreensaver) {
+				clearTimeout(this.timeoutScreensaver);
+				this.screensaverCountdown();
+			}
 		};
 		window.addEventListener('click', onClick, true);
 		window.addEventListener('keypress', onClick, true);
@@ -378,6 +386,7 @@ export default class App extends Component<AppProps, AppState> {
 
 	public componentWillUnmount(): void {
 		clearInterval(this.intervalMain);
+		clearTimeout(this.timeoutScreensaver);
 		this.player.stop();
 		this.player.removeEventListener('error', null);
 		this.player.removeEventListener('codecupdate', null);
@@ -632,9 +641,9 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private screensaverCountdown = () => {
-		setTimeout(() => {
+		this.timeoutScreensaver = setTimeout(() => {
 			this.onPressScreensaver();
-		}, 5 * 1000);
+		}, SCREENSAVERDELAY * 1000);
 	};
 
 	private onChangeScreensaverCheckbox = () => {
@@ -642,8 +651,8 @@ export default class App extends Component<AppProps, AppState> {
 		AsyncStorage.setItem(SCREENSAVERONOFF, screensaverOnOff);
 		this.setState({ checkedScreensaver: !this.state.checkedScreensaver });
 
-		if (screensaverOnOff === ON) {
-			this.screensaverCountdown();
+		if (screensaverOnOff === OFF) {
+			clearTimeout(this.timeoutScreensaver);
 		}
 	};
 
@@ -921,9 +930,7 @@ export default class App extends Component<AppProps, AppState> {
 						>
 							{screensaverIcon}
 						</Pressable>
-						<Pressable disabled={true} style={{ opacity: 0 }} onPressIn={this.onChangeScreensaverCheckbox}>
-							{screensaverCheckbox}
-						</Pressable>
+						<Pressable onPressIn={this.onChangeScreensaverCheckbox}>{screensaverCheckbox}</Pressable>
 					</View>
 					<View style={styles.settings}>
 						<Pressable
