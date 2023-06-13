@@ -12,7 +12,7 @@ An Electron app meant to run on a Linux device (such as a Raspberry Pi), connect
 - **Weather**: Shows the temperature (in Celsius) based on a given latitude and longitude
 - **Alarm Clock**: Automatically plays the radio stream at a given time, with volume fade-in
 - **Volume Control**: Resets the system volume to a given level (and unmutes) before starting the alarm clock
-- **Screensaver**: Shows a fullscreen view, manually or automatically
+- **Screensaver**: Shows a fullscreen view, manually or automatically (Warning: Not yeta real system-wide screensaver, as user activity outside of the app is ignored)
 
 TODO:
 
