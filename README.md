@@ -8,7 +8,7 @@ An Electron app meant to run on a Linux device (such as a Raspberry Pi), connect
 ## Functionality
 
 - **Time**: Shows the local time
-- **Music**: Plays an internet radio stream based on a given URL
+- **Music**: Plays an internet radio stream based on a given URL, shows the current song title and station metadata
 - **Weather**: Shows the temperature (in Celsius) based on a given latitude and longitude
 - **Alarm Clock**: Automatically plays the radio stream at a given time, with volume fade-in
 - **Volume Control**: Resets the system volume to a given level (and unmutes) before starting the alarm clock
