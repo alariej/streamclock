@@ -647,6 +647,7 @@ export default class App extends Component<AppProps, AppState> {
 			const streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
 			const latitude = this.settings[LOC1LAT] || DEFAULTLATITUDE;
 			const longitude = this.settings[LOC1LON] || DEFAULTLONGITUDE;
+			this.location1 = this.settings[LOC1ID];
 			this.location2 = this.settings[LOC2ID];
 			this.latitude2 = this.settings[LOC2LAT];
 			this.longitude2 = this.settings[LOC2LON];
@@ -735,7 +736,7 @@ export default class App extends Component<AppProps, AppState> {
 			const fontSizeTemp = this.screensaverWidth / 58;
 			const fontSizeSong = this.screensaverWidth / 58;
 			const padding = this.screensaverWidth / 200;
-			const paddingRight = this.screensaverWidth / 100;
+			const paddingRight = this.screensaverWidth / 130;
 
 			const maxBottom = 1.6 * (fontSizeTime + numLocations * fontSizeTemp);
 			const maxRight = 2.6 * fontSizeTime;
@@ -756,7 +757,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location2}
+							{this.location2.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature2 = (
@@ -773,7 +774,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location3}
+							{this.location3.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature3 = (
@@ -790,7 +791,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location4}
+							{this.location4.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature4 = (
@@ -815,7 +816,7 @@ export default class App extends Component<AppProps, AppState> {
 												{ fontSize: fontSizeTemp, paddingRight: paddingRight },
 											]}
 										>
-											{this.location1}
+											{this.location1.substring(0, 3).toUpperCase()}
 										</Text>
 										{location3}
 									</View>
