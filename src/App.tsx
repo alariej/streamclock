@@ -56,6 +56,7 @@ import {
 } from './uiconfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AlarmSettings from './settingsAlarm';
+// import Store from 'electron-store';
 
 const alarmWidth = 140;
 const streamTitleHeight = 48;
@@ -277,72 +278,47 @@ export default class App extends Component<AppProps, AppState> {
 	}
 
 	public async componentDidMount(): Promise<void> {
-		await AsyncStorage.getItem(SETTINGSSTORAGE)
-			.then(settings => {
-				if (settings) {
-					this.settings = JSON.parse(settings);
-					this.streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
-					this.location1 = this.settings[LOC1ID] || DEFAULTLOCATION;
-					this.latitude1 = this.settings[LOC1LAT] || DEFAULTLATITUDE;
-					this.longitude1 = this.settings[LOC1LON] || DEFAULTLONGITUDE;
-					this.location2 = this.settings[LOC2ID];
-					this.latitude2 = this.settings[LOC2LAT];
-					this.longitude2 = this.settings[LOC2LON];
-					this.location3 = this.settings[LOC3ID];
-					this.latitude3 = this.settings[LOC3LAT];
-					this.longitude3 = this.settings[LOC3LON];
-					this.location4 = this.settings[LOC4ID];
-					this.latitude4 = this.settings[LOC4LAT];
-					this.longitude4 = this.settings[LOC4LON];
-				} else {
-					this.streamUrl = DEFAULTSTREAMURL;
-					this.location1 = DEFAULTLOCATION;
-					this.latitude1 = DEFAULTLATITUDE;
-					this.longitude1 = DEFAULTLONGITUDE;
-				}
-			})
-			.catch();
+		const settings = await AsyncStorage.getItem(SETTINGSSTORAGE).catch();
+		if (settings) {
+			this.settings = JSON.parse(settings);
+			this.streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
+			this.location1 = this.settings[LOC1ID] || DEFAULTLOCATION;
+			this.latitude1 = this.settings[LOC1LAT] || DEFAULTLATITUDE;
+			this.longitude1 = this.settings[LOC1LON] || DEFAULTLONGITUDE;
+			this.location2 = this.settings[LOC2ID];
+			this.latitude2 = this.settings[LOC2LAT];
+			this.longitude2 = this.settings[LOC2LON];
+			this.location3 = this.settings[LOC3ID];
+			this.latitude3 = this.settings[LOC3LAT];
+			this.longitude3 = this.settings[LOC3LON];
+			this.location4 = this.settings[LOC4ID];
+			this.latitude4 = this.settings[LOC4LAT];
+			this.longitude4 = this.settings[LOC4LON];
+		} else {
+			this.streamUrl = DEFAULTSTREAMURL;
+			this.location1 = DEFAULTLOCATION;
+			this.latitude1 = DEFAULTLATITUDE;
+			this.longitude1 = DEFAULTLONGITUDE;
+		}
 
-		await AsyncStorage.getItem(ALARMSTORAGE)
-			.then(alarmSettings => {
-				if (alarmSettings) {
-					this.alarmSettings = JSON.parse(alarmSettings);
-					this.alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
-					this.alarmVolume = this.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME;
-				} else {
-					this.alarmTime = DEFAULTALARMTIME;
-					this.alarmVolume = DEFAULTALARMVOLUME;
-				}
-			})
-			.catch();
-
+		const alarmSettings = await AsyncStorage.getItem(ALARMSTORAGE).catch();
+		if (alarmSettings) {
+			this.alarmSettings = JSON.parse(alarmSettings);
+			this.alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
+			this.alarmVolume = this.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME;
+		} else {
+			this.alarmTime = DEFAULTALARMTIME;
+			this.alarmVolume = DEFAULTALARMVOLUME;
+		}
 		this.setState({ alarmTime: this.alarmTime });
 
-		let checkedAlarm = true;
-		await AsyncStorage.getItem(ALARMONOFF)
-			.then(alarmOnOff => {
-				if (alarmOnOff) {
-					checkedAlarm = alarmOnOff === ON;
-				} else {
-					checkedAlarm = true;
-				}
-			})
-			.catch();
+		// const store = new Store();
+		const alarmOnOff = await AsyncStorage.getItem(ALARMONOFF).catch();
+		// const alarmOnOff = store.get(ALARMONOFF);
+		this.setState({ checkedAlarm: alarmOnOff ? alarmOnOff === ON : false });
 
-		this.setState({ checkedAlarm: checkedAlarm });
-
-		let checkedScreensaver = true;
-		await AsyncStorage.getItem(SCREENSAVERONOFF)
-			.then(screensaverOnOff => {
-				if (screensaverOnOff) {
-					checkedScreensaver = screensaverOnOff === ON;
-				} else {
-					checkedScreensaver = true;
-				}
-			})
-			.catch();
-
-		this.setState({ checkedScreensaver: checkedScreensaver });
+		const screensaverOnOff = await AsyncStorage.getItem(SCREENSAVERONOFF).catch();
+		this.setState({ checkedScreensaver: screensaverOnOff ? screensaverOnOff === ON : false });
 
 		this.startPlayer();
 
@@ -659,11 +635,13 @@ export default class App extends Component<AppProps, AppState> {
 	private onChangeAlarmCheckbox = () => {
 		const alarmOnOff = this.state.checkedAlarm ? OFF : ON;
 		AsyncStorage.setItem(ALARMONOFF, alarmOnOff);
+		// const store = new Store();
+		// store.set(ALARMONOFF, alarmOnOff);
 		this.setState({ checkedAlarm: !this.state.checkedAlarm });
 	};
 
-	private closeSettings = async () => {
-		await AsyncStorage.getItem(SETTINGSSTORAGE)
+	private closeSettings = () => {
+		AsyncStorage.getItem(SETTINGSSTORAGE)
 			.then(settings => {
 				if (settings) {
 					this.settings = JSON.parse(settings);
@@ -709,8 +687,8 @@ export default class App extends Component<AppProps, AppState> {
 		this.setState({ showSettings: false });
 	};
 
-	private closeAlarmSettings = async () => {
-		await AsyncStorage.getItem(ALARMSTORAGE)
+	private closeAlarmSettings = () => {
+		AsyncStorage.getItem(ALARMSTORAGE)
 			.then(alarmSettings => {
 				if (alarmSettings) {
 					this.alarmSettings = JSON.parse(alarmSettings);
