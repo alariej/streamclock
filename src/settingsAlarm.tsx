@@ -18,7 +18,7 @@ import {
 	ALARMVOLUME,
 	DEFAULTALARMVOLUME,
 } from './uiconfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Store from 'electron-store';
 
 const fontSize = 16;
 const gridMargin = 4;
@@ -100,14 +100,12 @@ export default class AlarmSettings extends Component<AlarmSettingsProps, AlarmSe
 	}
 
 	public componentDidMount(): void {
-		AsyncStorage.getItem(ALARMSTORAGE)
-			.then(settings => {
-				if (settings) {
-					this.alarmSettings = JSON.parse(settings);
-					this.setState({ alarmSettings: this.alarmSettings });
-				}
-			})
-			.catch();
+		const store = new Store();
+		const settings = store.get(ALARMSTORAGE) as string;
+		if (settings) {
+			this.alarmSettings = JSON.parse(settings);
+			this.setState({ alarmSettings: this.alarmSettings });
+		}
 	}
 
 	private onChangeText = (textInput: string, text: string) => {
@@ -118,7 +116,8 @@ export default class AlarmSettings extends Component<AlarmSettingsProps, AlarmSe
 		if (this.alarmSettings[ALARMTIME].length === 4) {
 			this.alarmSettings[ALARMTIME] = '0' + this.alarmSettings[ALARMTIME];
 		}
-		AsyncStorage.setItem(ALARMSTORAGE, JSON.stringify(this.alarmSettings));
+		const store = new Store();
+		store.set(ALARMSTORAGE, JSON.stringify(this.alarmSettings));
 		this.setState({ pressed: SAVE });
 		setTimeout(() => {
 			this.setState({ pressed: '' });

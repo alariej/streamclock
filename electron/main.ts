@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import { ipcMain } from 'electron';
 import path from 'node:path';
 import * as loudness from '@matthey/loudness';
+import Store from 'electron-store';
 
 // The built directory structure
 //
@@ -57,4 +58,7 @@ app.on('window-all-closed', () => {
 	win = null;
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+	Store.initRenderer();
+	createWindow();
+});

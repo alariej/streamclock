@@ -54,9 +54,8 @@ import {
 	STREAMURL,
 	SettingsData,
 } from './uiconfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Store from 'electron-store';
 import AlarmSettings from './settingsAlarm';
-// import Store from 'electron-store';
 
 const alarmWidth = 140;
 const streamTitleHeight = 48;
@@ -278,7 +277,9 @@ export default class App extends Component<AppProps, AppState> {
 	}
 
 	public async componentDidMount(): Promise<void> {
-		const settings = await AsyncStorage.getItem(SETTINGSSTORAGE).catch();
+		const store = new Store();
+
+		const settings = store.get(SETTINGSSTORAGE) as string;
 		if (settings) {
 			this.settings = JSON.parse(settings);
 			this.streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
@@ -301,7 +302,7 @@ export default class App extends Component<AppProps, AppState> {
 			this.longitude1 = DEFAULTLONGITUDE;
 		}
 
-		const alarmSettings = await AsyncStorage.getItem(ALARMSTORAGE).catch();
+		const alarmSettings = store.get(ALARMSTORAGE) as string;
 		if (alarmSettings) {
 			this.alarmSettings = JSON.parse(alarmSettings);
 			this.alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
@@ -312,12 +313,10 @@ export default class App extends Component<AppProps, AppState> {
 		}
 		this.setState({ alarmTime: this.alarmTime });
 
-		// const store = new Store();
-		const alarmOnOff = await AsyncStorage.getItem(ALARMONOFF).catch();
-		// const alarmOnOff = store.get(ALARMONOFF);
+		const alarmOnOff = store.get(ALARMONOFF) as string;
 		this.setState({ checkedAlarm: alarmOnOff ? alarmOnOff === ON : false });
 
-		const screensaverOnOff = await AsyncStorage.getItem(SCREENSAVERONOFF).catch();
+		const screensaverOnOff = store.get(SCREENSAVERONOFF) as string;
 		this.setState({ checkedScreensaver: screensaverOnOff ? screensaverOnOff === ON : false });
 
 		this.startPlayer();
@@ -346,7 +345,7 @@ export default class App extends Component<AppProps, AppState> {
 			}
 		}, 15 * 1000);
 
-		if (this.state.checkedScreensaver) {
+		if (screensaverOnOff === ON) {
 			this.screensaverCountdown();
 		}
 
@@ -624,7 +623,8 @@ export default class App extends Component<AppProps, AppState> {
 
 	private onChangeScreensaverCheckbox = () => {
 		const screensaverOnOff = this.state.checkedScreensaver ? OFF : ON;
-		AsyncStorage.setItem(SCREENSAVERONOFF, screensaverOnOff);
+		const store = new Store();
+		store.set(SCREENSAVERONOFF, screensaverOnOff);
 		this.setState({ checkedScreensaver: !this.state.checkedScreensaver });
 
 		if (screensaverOnOff === OFF) {
@@ -634,77 +634,72 @@ export default class App extends Component<AppProps, AppState> {
 
 	private onChangeAlarmCheckbox = () => {
 		const alarmOnOff = this.state.checkedAlarm ? OFF : ON;
-		AsyncStorage.setItem(ALARMONOFF, alarmOnOff);
-		// const store = new Store();
-		// store.set(ALARMONOFF, alarmOnOff);
+		const store = new Store();
+		store.set(ALARMONOFF, alarmOnOff);
 		this.setState({ checkedAlarm: !this.state.checkedAlarm });
 	};
 
 	private closeSettings = () => {
-		AsyncStorage.getItem(SETTINGSSTORAGE)
-			.then(settings => {
-				if (settings) {
-					this.settings = JSON.parse(settings);
-					const streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
-					const latitude = this.settings[LOC1LAT] || DEFAULTLATITUDE;
-					const longitude = this.settings[LOC1LON] || DEFAULTLONGITUDE;
-					this.location2 = this.settings[LOC2ID];
-					this.latitude2 = this.settings[LOC2LAT];
-					this.longitude2 = this.settings[LOC2LON];
-					this.location3 = this.settings[LOC3ID];
-					this.latitude3 = this.settings[LOC3LAT];
-					this.longitude3 = this.settings[LOC3LON];
-					this.location4 = this.settings[LOC4ID];
-					this.latitude4 = this.settings[LOC4LAT];
-					this.longitude4 = this.settings[LOC4LON];
+		const store = new Store();
+		const settings = store.get(SETTINGSSTORAGE) as string;
+		if (settings) {
+			this.settings = JSON.parse(settings);
+			const streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
+			const latitude = this.settings[LOC1LAT] || DEFAULTLATITUDE;
+			const longitude = this.settings[LOC1LON] || DEFAULTLONGITUDE;
+			this.location2 = this.settings[LOC2ID];
+			this.latitude2 = this.settings[LOC2LAT];
+			this.longitude2 = this.settings[LOC2LON];
+			this.location3 = this.settings[LOC3ID];
+			this.latitude3 = this.settings[LOC3LAT];
+			this.longitude3 = this.settings[LOC3LON];
+			this.location4 = this.settings[LOC4ID];
+			this.latitude4 = this.settings[LOC4LAT];
+			this.longitude4 = this.settings[LOC4LON];
 
-					if (streamUrl !== this.streamUrl) {
-						this.streamUrl = streamUrl;
-						const playerState = this.player.state;
-						if (playerState === 'playing') {
-							this.stopStream(false);
-						}
-						this.player.stop();
-						this.player.removeEventListener('error', null);
-						this.player.removeEventListener('codecupdate', null);
-						this.player.removeEventListener('metadata', null);
-						this.player.removeEventListener('streamstart', null);
-						this.startPlayer();
-						if (playerState === 'playing') {
-							this.startStream(false);
-						}
-					}
-
-					if (latitude !== this.latitude1 || longitude !== this.longitude1) {
-						this.latitude1 = latitude;
-						this.longitude1 = longitude;
-						this.setTemperature1();
-					}
+			if (streamUrl !== this.streamUrl) {
+				this.streamUrl = streamUrl;
+				const playerState = this.player.state;
+				if (playerState === 'playing') {
+					this.stopStream(false);
 				}
-			})
-			.catch();
+				this.player.stop();
+				this.player.removeEventListener('error', null);
+				this.player.removeEventListener('codecupdate', null);
+				this.player.removeEventListener('metadata', null);
+				this.player.removeEventListener('streamstart', null);
+				this.startPlayer();
+				if (playerState === 'playing') {
+					this.startStream(false);
+				}
+			}
+
+			if (latitude !== this.latitude1 || longitude !== this.longitude1) {
+				this.latitude1 = latitude;
+				this.longitude1 = longitude;
+				this.setTemperature1();
+			}
+		}
 
 		this.setState({ showSettings: false });
 	};
 
 	private closeAlarmSettings = () => {
-		AsyncStorage.getItem(ALARMSTORAGE)
-			.then(alarmSettings => {
-				if (alarmSettings) {
-					this.alarmSettings = JSON.parse(alarmSettings);
-					const alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
-					const alarmVolume = this.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME;
+		const store = new Store();
+		const alarmSettings = store.get(ALARMSTORAGE) as string;
+		if (alarmSettings) {
+			this.alarmSettings = JSON.parse(alarmSettings);
+			const alarmTime = this.alarmSettings[ALARMTIME] || DEFAULTALARMTIME;
+			const alarmVolume = this.alarmSettings[ALARMVOLUME] || DEFAULTALARMVOLUME;
 
-					if (alarmTime !== this.alarmTime) {
-						this.alarmTime = alarmTime;
-						this.setState({ alarmTime: alarmTime });
-					}
-					if (alarmVolume !== this.alarmVolume) {
-						this.alarmVolume = alarmVolume;
-					}
-				}
-			})
-			.catch();
+			if (alarmTime !== this.alarmTime) {
+				this.alarmTime = alarmTime;
+				this.setState({ alarmTime: alarmTime });
+			}
+			if (alarmVolume !== this.alarmVolume) {
+				this.alarmVolume = alarmVolume;
+			}
+		}
 
 		this.setState({ showAlarmSettings: false });
 	};

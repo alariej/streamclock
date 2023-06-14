@@ -35,7 +35,7 @@ import {
 	TEXTINPUTBACKGROUNDCOLOR,
 	TEXTINPUTFONTCOLOR,
 } from './uiconfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Store from 'electron-store';
 import packageJson from '../package.json';
 
 const fontSize = 16;
@@ -134,14 +134,12 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 	}
 
 	public componentDidMount(): void {
-		AsyncStorage.getItem(SETTINGSSTORAGE)
-			.then(settings => {
-				if (settings) {
-					this.settings = JSON.parse(settings);
-					this.setState({ settings: this.settings });
-				}
-			})
-			.catch();
+		const store = new Store();
+		const settings = store.get(SETTINGSSTORAGE) as string;
+		if (settings) {
+			this.settings = JSON.parse(settings);
+			this.setState({ settings: this.settings });
+		}
 	}
 
 	private onChangeText = (textInput: string, text: string) => {
@@ -149,7 +147,8 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 	};
 
 	private onSave = () => {
-		AsyncStorage.setItem(SETTINGSSTORAGE, JSON.stringify(this.settings));
+		const store = new Store();
+		store.set(SETTINGSSTORAGE, JSON.stringify(this.settings));
 		this.setState({ pressed: SAVE });
 		setTimeout(() => {
 			this.setState({ pressed: '' });
