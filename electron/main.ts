@@ -38,6 +38,10 @@ function createWindow() {
 		},
 	});
 
+	win.webContents.on('did-finish-load', () => {
+		win?.webContents.focus();
+	});
+
 	ipcMain.on('reset-main-volume', (_event, volume) => {
 		loudness.setVolume(volume);
 		loudness.setMuted(false);
