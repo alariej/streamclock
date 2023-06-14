@@ -2,7 +2,7 @@
   "name": "streamclock",
   "displayName": "StreamClock",
   "private": true,
-  "version": "0.2.1",
+	"main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder --linux AppImage",
@@ -34,6 +34,5 @@
     "vite": "^4.3.2",
     "vite-plugin-electron": "^0.11.2",
     "vite-plugin-electron-renderer": "^0.14.5"
-  },
-  "main": "dist-electron/main.js"
+	}
 }
