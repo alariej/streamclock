@@ -5,10 +5,35 @@
 	"main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder --linux AppImage",
+		"build": "tsc && vite build && electron-builder",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
+	"build": {
+		"appId": "streamclock.linux",
+		"linux": {
+			"artifactName": "${name}-${arch}.${ext}",
+			"target": "appImage",
+			"icon": "public/logo.png"
+		},
+		"files": [
+			"!*",
+			"!**/*",
+			"dist-electron",
+			"dist"
+		],
+		"extraResources": [
+			"public/logo.png"
+		],
+		"directories": {
+			"output": "dist-appImage"
+		},
+		"publish": {
+			"provider": "generic",
+			"channel": "latest",
+			"url": "https://github.com/alariej/streamclock/releases"
+		}
+	},
   "dependencies": {
     "@matthey/loudness": "^0.6.5",
     "@react-native-async-storage/async-storage": "^1.18.2",
