@@ -39,13 +39,14 @@ function createWindow() {
 		},
 	});
 
+	// useless, still need two clicks on first interaction with app
+	/* 
 	win.webContents.on('did-finish-load', () => {
-		// doesn't seem to work
-		// still need two clicks for first interaction with app
 		setTimeout(() => {
 			win?.webContents.focus();
 		}, 1000);
 	});
+	*/
 
 	ipcMain.on('reset-main-volume', (_event, volume) => {
 		loudness.setMuted(false);
@@ -56,12 +57,15 @@ function createWindow() {
 
 	ipcMain.on('turn-on-cec', (_event, CECAddress) => {
 		const turnOn = 'echo "on ' + CECAddress + '" | cec-client -s -d 1';
+		child.exec(turnOn);
+		// not sure why this rechanges the source to previous source
+		/*
 		const changeSource = 'echo "as" | cec-client -s -d 1';
 
-		child.exec(turnOn);
 		setTimeout(() => {
 			child.exec(changeSource);
 		}, 5 * 1000);
+		*/
 	});
 
 	ipcMain.on('enter-fullscreen', () => {
@@ -79,7 +83,8 @@ app.on('window-all-closed', () => {
 	win = null;
 });
 
-app.commandLine.appendSwitch('enable-features', 'HardwareMediaKeyHandling, MediaSessionService');
+// useless, media buttons on remote control still not working
+// app.commandLine.appendSwitch('enable-features', 'HardwareMediaKeyHandling, MediaSessionService');
 
 app.whenReady().then(() => {
 	Store.initRenderer();
