@@ -32,29 +32,18 @@ TODO:
 
 - `npm run build`
 
-## Install on arm64
+## Install on Raspberry Pi
 
 This was tested on a Raspberry Pi 4B running Ubuntu 22.04.
 
 - Download the .AppImage file to device
 - Copy in Home folder
-- Rename file to streamclock.AppImage (optional)
 - Change file permissions to "Executable as Program" (GUI)
-- or, `chmod a+x streamclock.AppImage`
+- or, `chmod a+x *.AppImage`
 - Add app to startup programs (command: `./streamclock.AppImage`)
-- `sudo apt install zlib1g-dev`
-- `sudo apt install libfuse2`
+- `sudo apt install zlib1g-dev` (if required)
+- `sudo apt install libfuse2` (if required)
 - Start app via command line or file manager, or by rebooting the system
-
-## HDMI-CEC stuff (temporary)
-
-sudo apt install cec-utils
-sudo usermod -a -G video $(whoami)
-reboot
-sudo nano /boot/firmware/config.txt
--> dtoverlay=vc4-fkms-v3d
-reboot
-echo 'scan' | cec-client -s -d 1
 
 ## License
 
