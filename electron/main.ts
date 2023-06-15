@@ -3,6 +3,7 @@ import { ipcMain } from 'electron';
 import path from 'node:path';
 import * as loudness from '@matthey/loudness';
 import Store from 'electron-store';
+import * as child from 'node:child_process';
 
 // The built directory structure
 //
@@ -39,13 +40,17 @@ function createWindow() {
 	});
 
 	win.webContents.on('did-finish-load', () => {
-		win?.webContents.focus();
+		// doesn't seem to work
+		// still need two clicks for first interaction with app
+		setTimeout(() => {
+			win?.webContents.focus();
+		}, 1000);
 	});
 
 	ipcMain.on('reset-main-volume', (_event, volume) => {
 		loudness.setMuted(false);
 		setTimeout(() => {
-		loudness.setVolume(volume);
+			loudness.setVolume(volume);
 		}, 100);
 	});
 
@@ -73,6 +78,8 @@ function createWindow() {
 app.on('window-all-closed', () => {
 	win = null;
 });
+
+app.commandLine.appendSwitch('enable-features', 'HardwareMediaKeyHandling, MediaSessionService');
 
 app.whenReady().then(() => {
 	Store.initRenderer();
