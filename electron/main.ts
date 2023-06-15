@@ -58,14 +58,11 @@ function createWindow() {
 	ipcMain.on('turn-on-cec', (_event, CECAddress) => {
 		const turnOn = 'echo "on ' + CECAddress + '" | cec-client -s -d 1';
 		child.exec(turnOn);
-		// not sure why this rechanges the source to previous source
-		/*
-		const changeSource = 'echo "as" | cec-client -s -d 1';
 
+		const changeSource = 'echo "as" | cec-client -s -d 1';
 		setTimeout(() => {
 			child.exec(changeSource);
 		}, 5 * 1000);
-		*/
 	});
 
 	ipcMain.on('enter-fullscreen', () => {
