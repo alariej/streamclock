@@ -9,6 +9,8 @@ import {
 	DEFAULTLONGITUDE,
 	DEFAULTSTREAMURL,
 	FONTCOLOR,
+	HDMICEC,
+	HDMICECPLACEHOLDER,
 	LATITUDEPLACEHOLDER,
 	LOC1ID,
 	LOC1LAT,
@@ -298,6 +300,18 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 								key={this.state?.settings[LOC4LON] || LOC4LON}
 								defaultValue={this.state?.settings[LOC4LON]}
 								placeholder={LONGITUDEPLACEHOLDER}
+								placeholderTextColor={PLACEHOLDERCOLOR}
+							/>
+						</View>
+						<View style={styles.settingsRow}>
+							<Text style={styles.label}>HDMI-CEC</Text>
+							<TextInput
+								style={styles.locationInput}
+								spellCheck={false}
+								onChangeText={text => this.onChangeText(HDMICEC, text)}
+								key={this.state?.settings[HDMICEC] || HDMICEC}
+								defaultValue={this.state?.settings[HDMICEC]}
+								placeholder={HDMICECPLACEHOLDER}
 								placeholderTextColor={PLACEHOLDERCOLOR}
 							/>
 						</View>

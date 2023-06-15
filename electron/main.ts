@@ -44,7 +44,15 @@ function createWindow() {
 
 	ipcMain.on('reset-main-volume', (_event, volume) => {
 		loudness.setVolume(volume);
-		loudness.setMuted(false);
+
+	ipcMain.on('turn-on-cec', (_event, CECAddress) => {
+		const turnOn = 'echo "on ' + CECAddress + '" | cec-client -s -d 1';
+		const changeSource = 'echo "as" | cec-client -s -d 1';
+
+		child.exec(turnOn);
+		setTimeout(() => {
+			child.exec(changeSource);
+		}, 5 * 1000);
 	});
 
 	ipcMain.on('enter-fullscreen', () => {

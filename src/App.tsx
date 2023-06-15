@@ -28,6 +28,7 @@ import {
 	DEFAULTSTREAMURL,
 	FONTCOLOR,
 	FONTSIZE,
+	HDMICEC,
 	LOC1ID,
 	LOC1LAT,
 	LOC1LON,
@@ -245,6 +246,7 @@ export default class App extends Component<AppProps, AppState> {
 	private latitude4 = '';
 	private longitude4 = '';
 	private temperature4 = '';
+	private CECAddress = '';
 	private alarmTime = '';
 	private alarmVolume = '';
 	private alarmDuration = DEFAULTALARMDURATION;
@@ -295,6 +297,7 @@ export default class App extends Component<AppProps, AppState> {
 			this.location4 = this.settings[LOC4ID];
 			this.latitude4 = this.settings[LOC4LAT];
 			this.longitude4 = this.settings[LOC4LON];
+			this.CECAddress = this.settings[HDMICEC];
 		} else {
 			this.streamUrl = DEFAULTSTREAMURL;
 			this.location1 = DEFAULTLOCATION;
@@ -334,10 +337,17 @@ export default class App extends Component<AppProps, AppState> {
 			const timeOfDay = this.getTimeOfDay(date);
 
 			if (this.player.state !== 'playing' && this.alarmTime === timeOfDay) {
-				this.resetMainVolume();
-				this.setState({ streamTitle: '( Starting alarm... )' });
-				this.startStream(true);
-				this.stopAlarmTimeout();
+				let delay = 1;
+				if (this.CECAddress) {
+					this.turnOnCEC();
+					delay = 10;
+				}
+				setTimeout(() => {
+					this.resetMainVolume();
+					this.setState({ streamTitle: '( Starting alarm... )' });
+					this.startStream(true);
+					this.stopAlarmTimeout();
+				}, delay * 1000);
 			}
 
 			if ([0, 15, 30, 45].includes(date.getMinutes())) {
@@ -476,6 +486,11 @@ export default class App extends Component<AppProps, AppState> {
 		const { ipcRenderer } = window.require('electron');
 		const volume = Number(this.alarmVolume) || Number(DEFAULTALARMVOLUME);
 		ipcRenderer.send('reset-main-volume', volume);
+	};
+
+	private turnOnCEC = () => {
+		const { ipcRenderer } = window.require('electron');
+		ipcRenderer.send('turn-on-cec', this.CECAddress);
 	};
 
 	private fadeIn = () => {
@@ -657,6 +672,7 @@ export default class App extends Component<AppProps, AppState> {
 			this.location4 = this.settings[LOC4ID];
 			this.latitude4 = this.settings[LOC4LAT];
 			this.longitude4 = this.settings[LOC4LON];
+			this.CECAddress = this.settings[HDMICEC];
 
 			if (streamUrl !== this.streamUrl) {
 				this.streamUrl = streamUrl;

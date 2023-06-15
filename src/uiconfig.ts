@@ -47,6 +47,8 @@ export const SCREENSAVERONOFF = 'screensaver_onoff';
 export const ON = 'on';
 export const OFF = 'off';
 export const SCREENSAVERDELAY = 60;
+export const HDMICEC = 'hdmi_cec';
+export const HDMICECPLACEHOLDER = 'CEC Address';
 
 export interface SettingsData {
 	[key: string]: string;
