@@ -43,7 +43,11 @@ function createWindow() {
 	});
 
 	ipcMain.on('reset-main-volume', (_event, volume) => {
+		loudness.setMuted(false);
+		setTimeout(() => {
 		loudness.setVolume(volume);
+		}, 100);
+	});
 
 	ipcMain.on('turn-on-cec', (_event, CECAddress) => {
 		const turnOn = 'echo "on ' + CECAddress + '" | cec-client -s -d 1';
