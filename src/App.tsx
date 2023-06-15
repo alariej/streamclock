@@ -329,8 +329,8 @@ export default class App extends Component<AppProps, AppState> {
 
 		this.setTemperature1();
 
-		const date = new Date();
-		this.getTimeOfDay(date);
+		this.getTimeOfDay(new Date());
+		let lastMinute = -1;
 
 		this.intervalMain = setInterval(() => {
 			const date = new Date();
@@ -350,8 +350,13 @@ export default class App extends Component<AppProps, AppState> {
 				}, delay * 1000);
 			}
 
-			if ([0, 15, 30, 45].includes(date.getMinutes())) {
+			const thisMinute = date.getMinutes();
+			if (thisMinute !== lastMinute && [0, 15, 30, 45].includes(thisMinute)) {
 				this.setTemperature1();
+				if (this.state.isScreensaver) {
+					this.setTemperatureScreenSaver();
+				}
+				lastMinute = thisMinute;
 			}
 		}, 15 * 1000);
 
