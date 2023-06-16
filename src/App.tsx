@@ -42,6 +42,8 @@ import {
 	LOC4LAT,
 	LOC4LON,
 	MARGIN,
+	MUSICOFF,
+	NOMETADATA,
 	OFF,
 	ON,
 	OPACITYPRESSED,
@@ -51,7 +53,11 @@ import {
 	SCREENSAVERONOFF,
 	SETTINGS,
 	SETTINGSSTORAGE,
+	STARTINGALARM,
+	STARTINGSTREAM,
 	STOP,
+	STOPPINGALARM,
+	STOPPINGSTREAM,
 	STREAMURL,
 	SettingsData,
 } from './uiconfig';
@@ -352,7 +358,7 @@ export default class App extends Component<AppProps, AppState> {
 				}
 				setTimeout(() => {
 					this.resetMainVolume();
-					this.setState({ streamTitle: '( Starting alarm... )' });
+					this.setState({ streamTitle: STARTINGALARM });
 					this.startStream(true);
 					this.stopAlarmTimeout();
 				}, delay * 1000);
@@ -410,7 +416,7 @@ export default class App extends Component<AppProps, AppState> {
 
 	private onMetadata = (metadata: IcyMetadata) => {
 		if (!this.stoppingAlarm) {
-			this.setState({ streamTitle: metadata.StreamTitle || '( No metadata available )' });
+			this.setState({ streamTitle: metadata.StreamTitle || NOMETADATA });
 			this.streamTitlePos = Math.random() > 0.5 ? 'top' : 'bottom';
 		}
 	};
@@ -465,7 +471,7 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private startStream = (withFadeIn: boolean) => {
-		this.setState({ pressed: PLAY, streamTitle: '( Starting stream... )' });
+		this.setState({ pressed: PLAY, streamTitle: STARTINGSTREAM });
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
@@ -480,7 +486,7 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private stopStream = (withFadeOut: boolean) => {
-		this.setState({ pressed: STOP, streamTitle: '( Stopping stream... )' });
+		this.setState({ pressed: STOP, streamTitle: STOPPINGSTREAM });
 		this.withFadeIn = false;
 		setTimeout(() => {
 			this.setState({ pressed: '' });
@@ -599,7 +605,7 @@ export default class App extends Component<AppProps, AppState> {
 	private stopAlarmTimeout = () => {
 		setTimeout(() => {
 			if (this.player.state !== 'stopped') {
-				this.setState({ streamTitle: '( Stopping alarm... )' });
+				this.setState({ streamTitle: STOPPINGALARM });
 				this.stoppingAlarm = true;
 				this.stopStream(true);
 			}
@@ -895,7 +901,7 @@ export default class App extends Component<AppProps, AppState> {
 				<View style={styles.containerApp}>
 					<Text style={styles.stationInfo}>{this.state.stationInfo}</Text>
 					<View style={styles.streamTitle}>
-						<Text style={styles.streamTitleText}>{this.state.streamTitle || '( Music off )'}</Text>
+						<Text style={styles.streamTitleText}>{this.state.streamTitle || MUSICOFF}</Text>
 					</View>
 					<View style={styles.buttonContainer}>
 						<Pressable

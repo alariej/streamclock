@@ -49,6 +49,12 @@ export const OFF = 'off';
 export const SCREENSAVERDELAY = 60;
 export const HDMICEC = 'hdmi_cec';
 export const HDMICECPLACEHOLDER = 'CEC Address';
+export const NOMETADATA = '( No metadata available )';
+export const STARTINGSTREAM = '( Starting stream... )';
+export const STOPPINGSTREAM = '( Stopping stream... )';
+export const STARTINGALARM = '( Starting alarm... )';
+export const STOPPINGALARM = '( Stopping alarm... )';
+export const MUSICOFF = '( Music off )';
 
 export interface SettingsData {
 	[key: string]: string;
