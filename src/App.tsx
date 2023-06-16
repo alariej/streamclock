@@ -438,7 +438,18 @@ export default class App extends Component<AppProps, AppState> {
 
 	private onMetadata = (metadata: IcyMetadata) => {
 		if (!this.stoppingAlarm) {
+			const previousTitle = this.state.streamTitle;
 			this.setState({ streamTitle: metadata.StreamTitle || NOMETADATA });
+			setTimeout(() => {
+				if (this.state.streamTitle === NOMETADATA) {
+					this.setState({ streamTitle: '' });
+				}
+			}, 20 * 1000);
+			setTimeout(() => {
+				if (this.state.streamTitle === previousTitle) {
+					this.setState({ streamTitle: '' });
+				}
+			}, 5 * 60 * 1000);
 			this.streamTitlePos = Math.random() > 0.5 ? 'top' : 'bottom';
 		}
 	};
@@ -474,9 +485,9 @@ export default class App extends Component<AppProps, AppState> {
 						if (response.status !== 200) {
 							this.statsError = true;
 						} else {
-						const stats = await response.json().catch(() => null);
-						host = stats?.icestats?.host;
-						location = stats?.icestats?.location;
+							const stats = await response.json().catch(() => null);
+							host = stats?.icestats?.host;
+							location = stats?.icestats?.location;
 						}
 					})
 					.catch(() => {
