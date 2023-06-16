@@ -80,6 +80,11 @@ app.on('window-all-closed', () => {
 	win = null;
 });
 
+// useless, still get CORS errors reading stream URLs in dev mode
+// app.commandLine.appendSwitch('disable-site-isolation-trials');
+// app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+// app.commandLine.appendSwitch('disable-features', 'BlockInsecurePrivateNetworkRequests');
+
 // useless, media buttons on remote control still not working
 // app.commandLine.appendSwitch('enable-features', 'HardwareMediaKeyHandling, MediaSessionService');
 
