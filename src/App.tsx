@@ -438,18 +438,7 @@ export default class App extends Component<AppProps, AppState> {
 
 	private onMetadata = (metadata: IcyMetadata) => {
 		if (!this.stoppingAlarm) {
-			const previousTitle = this.state.streamTitle;
 			this.setState({ streamTitle: metadata.StreamTitle || NOMETADATA });
-			setTimeout(() => {
-				if (this.state.streamTitle === NOMETADATA) {
-					this.setState({ streamTitle: '' });
-				}
-			}, 20 * 1000);
-			setTimeout(() => {
-				if (this.state.streamTitle === previousTitle) {
-					this.setState({ streamTitle: '' });
-				}
-			}, 5 * 60 * 1000);
 			this.streamTitlePos = Math.random() > 0.5 ? 'top' : 'bottom';
 		}
 	};
@@ -655,16 +644,6 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private onPressScreensaver = async () => {
-		/* 
-		const fullscreenView = document.getElementById('fullscreenview');
-		fullscreenView?.requestFullscreen().catch(() => null);
-		*/
-
-		// TODO: there is a race condition here
-		// the font size on the screensaver is only correct
-		// because of the await in the settemperature call
-		// otherwise font size is for the non-fullscreen window
-
 		const { ipcRenderer } = window.require('electron');
 		ipcRenderer.send('enter-fullscreen');
 
@@ -675,6 +654,19 @@ export default class App extends Component<AppProps, AppState> {
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
+
+		setTimeout(() => {
+			if (this.state.isScreensaver && this.state.streamTitle === NOMETADATA) {
+				this.setState({ streamTitle: '' });
+			}
+		}, 20 * 1000);
+
+		const lastTitle = this.state.streamTitle;
+		setTimeout(() => {
+			if (this.state.isScreensaver && this.state.streamTitle === lastTitle) {
+				this.setState({ streamTitle: '' });
+			}
+		}, 5 * 60 * 1000);
 	};
 
 	private onPressSettings = () => {
