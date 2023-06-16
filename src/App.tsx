@@ -567,10 +567,10 @@ export default class App extends Component<AppProps, AppState> {
 				'&longitude=' +
 				longitude +
 				'&current_weather=true&forecast_days=1'
-		);
+		).catch(() => null);
 
-		if (response.status === 200) {
-			const weatherInfo = await response.json();
+		if (response?.status === 200) {
+			const weatherInfo = await response.json().catch(() => null);
 			const temperature = weatherInfo.current_weather.temperature;
 			let temperature_ = temperature;
 			if (Number(temperature) && temperature.toString().indexOf('.') === -1) {
@@ -583,21 +583,21 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private setTemperature1 = async () => {
-		const temperature = await this.getTemperature(this.latitude1, this.longitude1);
-		if (temperature !== this.state.temperature) {
+		const temperature = await this.getTemperature(this.latitude1, this.longitude1).catch(() => '');
+		if (temperature && temperature !== this.state.temperature) {
 			this.setState({ temperature: temperature });
 		}
 	};
 
 	private setTemperatureScreenSaver = async () => {
 		if (this.location2) {
-			this.temperature2 = await this.getTemperature(this.latitude2, this.longitude2);
+			this.temperature2 = await this.getTemperature(this.latitude2, this.longitude2).catch(() => '');
 		}
 		if (this.location3) {
-			this.temperature3 = await this.getTemperature(this.latitude3, this.longitude3);
+			this.temperature3 = await this.getTemperature(this.latitude3, this.longitude3).catch(() => '');
 		}
 		if (this.location4) {
-			this.temperature4 = await this.getTemperature(this.latitude4, this.longitude4);
+			this.temperature4 = await this.getTemperature(this.latitude4, this.longitude4).catch(() => '');
 		}
 	};
 
@@ -640,7 +640,7 @@ export default class App extends Component<AppProps, AppState> {
 		ipcRenderer.send('enter-fullscreen');
 
 		if (this.location2) {
-			await this.setTemperatureScreenSaver();
+			await this.setTemperatureScreenSaver().catch(() => null);
 		}
 		this.setState({ pressed: SCREENSAVER, isScreensaver: true });
 		setTimeout(() => {
