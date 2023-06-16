@@ -378,26 +378,39 @@ export default class App extends Component<AppProps, AppState> {
 			this.screensaverCountdown();
 		}
 
-		const onClick = () => {
-			if (this.state.checkedScreensaver) {
-				clearTimeout(this.timeoutScreensaver);
-				this.screensaverCountdown();
-			}
-		};
-		window.addEventListener('click', onClick, true);
-		window.addEventListener('keypress', onClick, true);
+		window.addEventListener('click', this.onUserEvent, true);
+		window.addEventListener('keypress', this.onUserEvent, true);
 	}
 
 	public componentWillUnmount(): void {
 		clearInterval(this.intervalMain);
 		clearTimeout(this.timeoutScreensaver);
+
 		this.player.stop();
+
 		this.player.removeEventListener('error', null);
 		this.player.removeEventListener('codecupdate', null);
 		this.player.removeEventListener('metadata', null);
 		this.player.removeEventListener('streamstart', null);
 		this.player.removeEventListener('stop', null);
+
+		window.removeEventListener('click', this.onUserEvent, true);
+		window.removeEventListener('keypress', this.onUserEvent, true);
 	}
+
+	private onUserEvent = (e: MouseEvent | PointerEvent | KeyboardEvent) => {
+		const enter = (e as KeyboardEvent).key === 'Enter';
+		const click = (e as PointerEvent).type === 'click';
+
+		if (this.state.isScreensaver && (enter || click)) {
+			this.closeScreenSaver();
+		}
+
+		if (this.state.checkedScreensaver) {
+			clearTimeout(this.timeoutScreensaver);
+			this.screensaverCountdown();
+		}
+	};
 
 	private startPlayer = () => {
 		this.player = new IcecastMetadataPlayer(this.streamUrl, {
@@ -882,7 +895,7 @@ export default class App extends Component<AppProps, AppState> {
 			}
 
 			displayView = (
-				<View style={styles.containerScreensaver} onPointerDown={this.closeScreenSaver}>
+				<View style={styles.containerScreensaver} /* onPointerDown={this.closeScreenSaver} */>
 					<View style={styles.streamTitleScreensaver}>
 						<Text numberOfLines={1} style={[styles.streamTitleTextScreensaver, { fontSize: fontSizeSong }]}>
 							{this.streamTitlePos === 'top' ? this.state.streamTitle : ''}
