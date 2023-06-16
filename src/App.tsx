@@ -221,6 +221,11 @@ const styles = StyleSheet.create({
 	},
 });
 
+interface CodecInfo {
+	bitrate: number;
+	sampleRate: number;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface AppProps {}
 
@@ -273,6 +278,8 @@ export default class App extends Component<AppProps, AppState> {
 	private top = 0;
 	private left = 0;
 	private timeoutScreensaver: NodeJS.Timer | undefined;
+	private codecUpdate = true;
+	private corsError = false;
 
 	constructor(props: AppProps) {
 		super(props);
@@ -372,6 +379,8 @@ export default class App extends Component<AppProps, AppState> {
 				}
 				lastMinute = thisMinute;
 			}
+
+			this.codecUpdate = true;
 		}, 15 * 1000);
 
 		if (screensaverOnOff === ON) {
@@ -450,34 +459,32 @@ export default class App extends Component<AppProps, AppState> {
 		return baseUrl ? baseUrl + 'status-json.xsl' : '';
 	};
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	private onCodecUpdate = async (codecInfo: any) => {
-		if (!this.state.stationInfo) {
+	private onCodecUpdate = async (codecInfo: object) => {
+		const codecInfo_ = codecInfo as CodecInfo;
+
+		if (this.codecUpdate) {
+			this.codecUpdate = false;
 			const statsUrl = this.getStatsUrl();
-			if (!statsUrl) {
-				this.setState({ stationInfo: '   ' });
-				return;
-			}
 
 			let host = '';
 			let location = '';
-			await fetch(statsUrl)
-				.then(async response => {
-					const stats = await response.json();
-					host = stats.icestats.host;
-					location = stats.icestats.location;
-				})
-				.catch();
+			if (statsUrl && !this.corsError) {
+				await fetch(statsUrl)
+					.then(async response => {
+						const stats = await response.json().catch(() => null);
+						host = stats?.icestats?.host;
+						location = stats?.icestats?.location;
+					})
+					.catch(() => (this.corsError = true));
+			}
 
 			this.setState({
 				stationInfo:
-					(host || '( No host )') +
-					'  ⋯  ' +
-					(location || '( Planet Earth )') +
-					'  ⋯  ' +
-					codecInfo.bitrate.toString() +
-					' bps, ' +
-					codecInfo.sampleRate.toString() +
+					(host ? host + '  ⋯  ' : '') +
+					(location ? location + '  ⋯  ' : '') +
+					codecInfo_.bitrate.toString() +
+					' kb/s, ' +
+					codecInfo_.sampleRate.toString() +
 					' Hz',
 			});
 		}
@@ -488,6 +495,11 @@ export default class App extends Component<AppProps, AppState> {
 		setTimeout(() => {
 			this.setState({ pressed: '' });
 		}, 250);
+		setTimeout(() => {
+			if (this.state.streamTitle === STARTINGSTREAM) {
+				this.setState({ streamTitle: NOMETADATA });
+			}
+		}, 10 * 1000);
 
 		if (withFadeIn) {
 			this.withFadeIn = true;
