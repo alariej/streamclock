@@ -455,6 +455,8 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private getStatsUrl = (): string => {
+		// this fucking crap doesn't work
+		// FIX ME
 		const urlMatch = this.streamUrl.match(/.*\//);
 		const baseUrl = urlMatch?.length ? urlMatch[0] : '';
 		return baseUrl ? baseUrl + 'status-json.xsl' : '';
