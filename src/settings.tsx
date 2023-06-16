@@ -9,6 +9,7 @@ import {
 	DEFAULTLONGITUDE,
 	DEFAULTSTREAMURL,
 	FONTCOLOR,
+	FONTFAMILY,
 	HDMICEC,
 	HDMICECPLACEHOLDER,
 	LATITUDEPLACEHOLDER,
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
 		marginVertical: gridMargin / 2,
 	},
 	label: {
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		color: FONTCOLOR,
 		width: 120,
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		flex: 1,
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		fontWeight: 'bold',
 		color: FONTCOLOR,
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
 	},
 	urlInput: {
 		width: width,
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: 16,
 		color: TEXTINPUTFONTCOLOR,
 		padding: textPadding,
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
 	},
 	locationInput: {
 		width: (width - 2 * gridMargin) / 3,
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		color: TEXTINPUTFONTCOLOR,
 		padding: textPadding,
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
 		backgroundColor: BUTTONCOLOR,
 	},
 	buttonText: {
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		color: FONTCOLOR,
 	},

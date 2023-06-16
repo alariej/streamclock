@@ -17,6 +17,7 @@ import {
 	DEFAULTALARMTIME,
 	ALARMVOLUME,
 	DEFAULTALARMVOLUME,
+	FONTFAMILY,
 } from './uiconfig';
 import Store from 'electron-store';
 
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
 		marginVertical: gridMargin / 2,
 	},
 	label: {
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		color: FONTCOLOR,
 		width: 160,
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
 	},
 	alarmInput: {
 		flex: 1,
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: 16,
 		color: TEXTINPUTFONTCOLOR,
 		padding: textPadding,
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
 		backgroundColor: BUTTONCOLOR,
 	},
 	buttonText: {
-		fontFamily: 'Piboto, Ubuntu, System',
+		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		color: FONTCOLOR,
 	},

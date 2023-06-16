@@ -55,6 +55,7 @@ export const STOPPINGSTREAM = '( Stopping stream... )';
 export const STARTINGALARM = '( Starting alarm... )';
 export const STOPPINGALARM = '( Stopping alarm... )';
 export const MUSICOFF = '( Music off )';
+export const FONTFAMILY = 'Piboto, Ubuntu, System';
 
 export interface SettingsData {
 	[key: string]: string;
