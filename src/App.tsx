@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	streamTitleText: {
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: 36,
 		textAlign: 'center',
 		color: FONTCOLOR,
@@ -107,11 +108,13 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 0,
 		right: 0,
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: FONTSIZE,
 		color: FONTCOLOR,
 		margin: MARGIN,
 	},
 	timeOfDay: {
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: 104,
 		fontWeight: 'bold',
 		textAlign: 'center',
@@ -120,6 +123,7 @@ const styles = StyleSheet.create({
 	},
 	stationInfo: {
 		height: FONTSIZE,
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: FONTSIZE,
 		textAlign: 'center',
 		color: FONTCOLOR,
@@ -142,6 +146,7 @@ const styles = StyleSheet.create({
 		width: alarmWidth,
 	},
 	alarmText: {
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: FONTSIZE,
 		color: FONTCOLOR,
 	},
@@ -175,6 +180,7 @@ const styles = StyleSheet.create({
 		cursor: 'none',
 	},
 	timeOfDayScreensaver: {
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontWeight: 'bold',
 		textAlign: 'center',
 		color: FONTCOLOR,
@@ -187,6 +193,7 @@ const styles = StyleSheet.create({
 	},
 	streamTitleTextScreensaver: {
 		textAlign: 'center',
+		fontFamily: 'Piboto, Ubuntu, System',
 		color: FONTCOLOR,
 	},
 	timeView: {
@@ -198,11 +205,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	temperatureScreensaver: {
+		fontFamily: 'Piboto, Ubuntu, System',
 		color: FONTCOLOR,
 	},
 	locationScreensaver: {
 		color: FONTCOLOR,
-		fontFamily: 'Ubuntu, System',
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontWeight: '100',
 	},
 });

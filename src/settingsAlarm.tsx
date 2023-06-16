@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
 		marginVertical: gridMargin / 2,
 	},
 	label: {
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: fontSize,
 		color: FONTCOLOR,
 		width: 160,
@@ -53,6 +54,7 @@ const styles = StyleSheet.create({
 	},
 	alarmInput: {
 		flex: 1,
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: 16,
 		color: TEXTINPUTFONTCOLOR,
 		padding: textPadding,
@@ -74,6 +76,7 @@ const styles = StyleSheet.create({
 		backgroundColor: BUTTONCOLOR,
 	},
 	buttonText: {
+		fontFamily: 'Piboto, Ubuntu, System',
 		fontSize: fontSize,
 		color: FONTCOLOR,
 	},
