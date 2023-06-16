@@ -279,7 +279,7 @@ export default class App extends Component<AppProps, AppState> {
 	private left = 0;
 	private timeoutScreensaver: NodeJS.Timer | undefined;
 	private codecUpdate = true;
-	private corsError = false;
+	private statsError = false;
 
 	constructor(props: AppProps) {
 		super(props);
@@ -468,14 +468,20 @@ export default class App extends Component<AppProps, AppState> {
 
 			let host = '';
 			let location = '';
-			if (statsUrl && !this.corsError) {
+			if (statsUrl && !this.statsError) {
 				await fetch(statsUrl)
 					.then(async response => {
+						if (response.status !== 200) {
+							this.statsError = true;
+						} else {
 						const stats = await response.json().catch(() => null);
 						host = stats?.icestats?.host;
 						location = stats?.icestats?.location;
+						}
 					})
-					.catch(() => (this.corsError = true));
+					.catch(() => {
+						this.statsError = true;
+					});
 			}
 
 			this.setState({
