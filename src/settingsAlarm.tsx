@@ -70,9 +70,9 @@ const styles = StyleSheet.create({
 	button: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		height: 32,
+		height: 36,
 		width: 140,
-		borderRadius: 32 / 2,
+		borderRadius: 36 / 2,
 		marginHorizontal: MARGIN,
 		backgroundColor: BUTTONCOLOR,
 	},
@@ -117,6 +117,10 @@ export default class AlarmSettings extends Component<AlarmSettingsProps, AlarmSe
 	};
 
 	private onSave = () => {
+		if (this.alarmSettings[ALARMTIME].indexOf(':') === -1) {
+			this.alarmSettings[ALARMTIME] =
+				this.alarmSettings[ALARMTIME].slice(-4, -2) + ':' + this.alarmSettings[ALARMTIME].slice(-2);
+		}
 		if (this.alarmSettings[ALARMTIME].length === 4) {
 			this.alarmSettings[ALARMTIME] = '0' + this.alarmSettings[ALARMTIME];
 		}
