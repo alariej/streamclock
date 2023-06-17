@@ -56,6 +56,8 @@ export const STARTINGALARM = '( Starting alarm... )';
 export const STOPPINGALARM = '( Stopping alarm... )';
 export const MUSICOFF = '( Music off )';
 export const FONTFAMILY = 'Piboto, Ubuntu, System';
+export const TOP = 'top';
+export const BOTTOM = 'bottom';
 
 export interface SettingsData {
 	[key: string]: string;

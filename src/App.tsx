@@ -18,6 +18,7 @@ import {
 	ALARMTIME,
 	ALARMVOLUME,
 	APPCOLOR,
+	BOTTOM,
 	BUTTONCOLOR,
 	DEFAULTALARMDURATION,
 	DEFAULTALARMTIME,
@@ -61,6 +62,7 @@ import {
 	STOPPINGSTREAM,
 	STREAMURL,
 	SettingsData,
+	TOP,
 } from './uiconfig';
 import Store from 'electron-store';
 import AlarmSettings from './settingsAlarm';
@@ -244,6 +246,7 @@ interface AppState {
 	showSettings: boolean;
 	showAlarmSettings: boolean;
 	isScreensaver: boolean;
+	streamTitlePos: string;
 }
 
 export default class App extends Component<AppProps, AppState> {
@@ -275,13 +278,13 @@ export default class App extends Component<AppProps, AppState> {
 	private alarmSettings: SettingsData = {};
 	private screensaverHeight = 0;
 	private screensaverWidth = 0;
-	private streamTitlePos = 'top';
 	private timeOfDay = '';
 	private top = 0;
 	private left = 0;
 	private timeoutScreensaver: NodeJS.Timer | undefined;
 	private codecUpdate = true;
 	private statsError = false;
+	private streamTitleInterval: NodeJS.Timer | undefined;
 
 	constructor(props: AppProps) {
 		super(props);
@@ -298,6 +301,7 @@ export default class App extends Component<AppProps, AppState> {
 			showAlarmSettings: false,
 			alarmTime: '',
 			isScreensaver: false,
+			streamTitlePos: TOP,
 		};
 	}
 
@@ -399,6 +403,7 @@ export default class App extends Component<AppProps, AppState> {
 	public componentWillUnmount(): void {
 		clearInterval(this.intervalMain);
 		clearTimeout(this.timeoutScreensaver);
+		clearInterval(this.streamTitleInterval);
 
 		this.player.stop();
 
@@ -444,7 +449,9 @@ export default class App extends Component<AppProps, AppState> {
 	private onMetadata = (metadata: IcyMetadata) => {
 		if (!this.stoppingAlarm) {
 			this.setState({ streamTitle: metadata.StreamTitle || NOMETADATA });
-			this.streamTitlePos = Math.random() > 0.5 ? 'top' : 'bottom';
+			if (this.state.isScreensaver) {
+				this.setState({ streamTitlePos: Math.random() > 0.5 ? TOP : BOTTOM });
+			}
 		}
 	};
 
@@ -664,16 +671,11 @@ export default class App extends Component<AppProps, AppState> {
 			this.setState({ pressed: '' });
 		}, 250);
 
-		setTimeout(() => {
-			if (this.state.isScreensaver && this.state.streamTitle === NOMETADATA) {
-				this.setState({ streamTitle: '' });
-			}
-		}, 20 * 1000);
-
-		const lastTitle = this.state.streamTitle;
-		setTimeout(() => {
+		let lastTitle = this.state.streamTitle;
+		this.streamTitleInterval = setInterval(() => {
 			if (this.state.isScreensaver && this.state.streamTitle === lastTitle) {
-				this.setState({ streamTitle: '' });
+				this.setState({ streamTitlePos: this.state.streamTitlePos === TOP ? BOTTOM : TOP });
+				lastTitle = this.state.streamTitle;
 			}
 		}, 5 * 60 * 1000);
 	};
@@ -931,13 +933,13 @@ export default class App extends Component<AppProps, AppState> {
 				<View style={styles.containerScreensaver} /* onPointerDown={this.closeScreenSaver} */>
 					<View style={styles.streamTitleScreensaver}>
 						<Text numberOfLines={1} style={[styles.streamTitleTextScreensaver, { fontSize: fontSizeSong }]}>
-							{this.streamTitlePos === 'top' ? this.state.streamTitle : ''}
+							{this.state.streamTitlePos === TOP ? this.state.streamTitle : ''}
 						</Text>
 					</View>
 					{timeView}
 					<View style={styles.streamTitleScreensaver}>
 						<Text numberOfLines={1} style={[styles.streamTitleTextScreensaver, { fontSize: fontSizeSong }]}>
-							{this.streamTitlePos === 'bottom' ? this.state.streamTitle : ''}
+							{this.state.streamTitlePos === BOTTOM ? this.state.streamTitle : ''}
 						</Text>
 					</View>
 				</View>
