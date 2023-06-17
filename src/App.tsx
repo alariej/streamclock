@@ -145,11 +145,12 @@ const styles = StyleSheet.create({
 	},
 	alarm: {
 		position: 'absolute',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
 		bottom: 0,
 		left: 0,
 		margin: MARGIN,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
 		width: alarmWidth,
 	},
 	alarmText: {
