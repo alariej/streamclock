@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, Tray, Menu, nativeImage, BrowserWindow, Event } from 'electron';
 import { ipcMain } from 'electron';
 import path from 'node:path';
 import * as loudness from '@matthey/loudness';
@@ -20,6 +20,9 @@ process.env.PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.D
 let win: BrowserWindow | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
+
+let tray: Tray | null;
+let doQuit = false;
 
 function createWindow() {
 	win = new BrowserWindow({
@@ -48,11 +51,31 @@ function createWindow() {
 	});
 	*/
 
+	win.on('minimize', (e: Event) => {
+		e.preventDefault();
+		win?.hide();
+	});
+
+	win.on('close', (e: Event) => {
+		if (!doQuit) {
+			e.preventDefault();
+			win?.hide();
+		}
+	});
+
 	ipcMain.on('reset-main-volume', (_event, volume) => {
 		loudness.setMuted(false);
 		setTimeout(() => {
 			loudness.setVolume(volume);
 		}, 100);
+	});
+
+	ipcMain.on('set-alarm-tray', (_event, isAlarm) => {
+		if (isAlarm) {
+			tray?.setImage(nativeImage.createFromPath(path.join(process.env.PUBLIC, 'alarm.png')));
+		} else {
+			tray?.setImage(nativeImage.createFromPath(path.join(process.env.PUBLIC, 'logo.png')));
+		}
 	});
 
 	ipcMain.on('turn-on-cec', (_event, CECAddress) => {
@@ -76,9 +99,11 @@ function createWindow() {
 	}
 }
 
+/* 
 app.on('window-all-closed', () => {
 	win = null;
 });
+*/
 
 // useless, still get CORS errors reading stream URLs in dev mode
 // app.commandLine.appendSwitch('disable-site-isolation-trials');
@@ -88,7 +113,33 @@ app.on('window-all-closed', () => {
 // useless, media buttons on remote control still not working
 // app.commandLine.appendSwitch('enable-features', 'HardwareMediaKeyHandling, MediaSessionService');
 
+app.on('second-instance', () => {
+	win?.show();
+});
+
+const showApp = () => {
+	win?.show();
+};
+
+const quitApp = () => {
+	win = null;
+	tray = null;
+	doQuit = true;
+	app.quit();
+};
+
 app.whenReady().then(() => {
+	const icon = nativeImage.createFromPath(path.join(process.env.PUBLIC, 'logo.png'));
+	tray = new Tray(icon);
+
+	const contextMenu = Menu.buildFromTemplate([
+		{ label: 'Show StreamClock', type: 'normal', click: showApp },
+		{ label: 'Quit StreamClock', type: 'normal', click: quitApp },
+	]);
+
+	tray.setContextMenu(contextMenu);
+	tray.setToolTip('StreamClock');
+
 	Store.initRenderer();
 	createWindow();
 });
