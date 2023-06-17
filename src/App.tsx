@@ -829,7 +829,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location2.substring(0, 3).toUpperCase()}
+							{this.location2?.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature2 = (
@@ -846,7 +846,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location3.substring(0, 3).toUpperCase()}
+							{this.location3?.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature3 = (
@@ -863,7 +863,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location4.substring(0, 3).toUpperCase()}
+							{this.location4?.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature4 = (
@@ -888,7 +888,7 @@ export default class App extends Component<AppProps, AppState> {
 												{ fontSize: fontSizeTemp, paddingRight: paddingRight },
 											]}
 										>
-											{this.location1.substring(0, 3).toUpperCase()}
+											{this.location1?.substring(0, 3).toUpperCase()}
 										</Text>
 										{location3}
 									</View>
