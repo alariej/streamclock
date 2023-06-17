@@ -20,6 +20,7 @@ import {
 	APPCOLOR,
 	BOTTOM,
 	BUTTONCOLOR,
+	CHECKEDURL,
 	DEFAULTALARMDURATION,
 	DEFAULTALARMTIME,
 	DEFAULTALARMVOLUME,
@@ -61,6 +62,9 @@ import {
 	STOPPINGALARM,
 	STOPPINGSTREAM,
 	STREAMURL,
+	STREAMURL2,
+	STREAMURL3,
+	STREAMURL4,
 	SettingsData,
 	TOP,
 } from './uiconfig';
@@ -166,8 +170,9 @@ const styles = StyleSheet.create({
 		left: 0,
 		margin: MARGIN,
 		flexDirection: 'row',
+		alignItems: 'center',
 		justifyContent: 'space-between',
-		width: 70,
+		width: alarmWidth,
 	},
 	alarmBar: {
 		position: 'absolute',
@@ -726,7 +731,32 @@ export default class App extends Component<AppProps, AppState> {
 		const settings = store.get(SETTINGSSTORAGE) as string;
 		if (settings) {
 			this.settings = JSON.parse(settings);
-			const streamUrl = this.settings[STREAMURL] || DEFAULTSTREAMURL;
+
+			let streamUrl;
+			if (this.settings[CHECKEDURL]) {
+				switch (this.settings[CHECKEDURL]) {
+					case '1':
+						streamUrl = this.settings[STREAMURL];
+						break;
+
+					case '2':
+						streamUrl = this.settings[STREAMURL2];
+						break;
+
+					case '3':
+						streamUrl = this.settings[STREAMURL3];
+						break;
+
+					case '4':
+						streamUrl = this.settings[STREAMURL4];
+						break;
+
+					default:
+						streamUrl = DEFAULTSTREAMURL;
+						break;
+				}
+			}
+
 			const latitude = this.settings[LOC1LAT] || DEFAULTLATITUDE;
 			const longitude = this.settings[LOC1LON] || DEFAULTLONGITUDE;
 			this.location1 = this.settings[LOC1ID];
@@ -742,7 +772,7 @@ export default class App extends Component<AppProps, AppState> {
 			this.CECAddress = this.settings[HDMICEC];
 
 			if (streamUrl !== this.streamUrl) {
-				this.streamUrl = streamUrl;
+				this.streamUrl = streamUrl || DEFAULTSTREAMURL;
 				const playerState = this.player.state;
 				if (playerState === 'playing') {
 					this.stopStream(false);
@@ -987,6 +1017,9 @@ export default class App extends Component<AppProps, AppState> {
 						>
 							{screensaverIcon}
 						</Pressable>
+						<Text selectable={false} style={styles.alarmText}>
+							Auto
+						</Text>
 						<Pressable onPressIn={this.onChangeScreensaverCheckbox}>{screensaverCheckbox}</Pressable>
 					</View>
 					<View style={styles.settings}>

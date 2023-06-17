@@ -3,6 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-nativ
 import {
 	APPCOLOR,
 	BUTTONCOLOR,
+	CHECKEDURL,
 	CLOSE,
 	DEFAULTLATITUDE,
 	DEFAULTLOCATION,
@@ -34,6 +35,9 @@ import {
 	SAVE,
 	SETTINGSSTORAGE,
 	STREAMURL,
+	STREAMURL2,
+	STREAMURL3,
+	STREAMURL4,
 	SettingsData,
 	TEXTINPUTBACKGROUNDCOLOR,
 	TEXTINPUTFONTCOLOR,
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
 		width: 120,
 		textAlign: 'right',
 		marginRight: 8,
-		padding: 4,
+		paddingVertical: 4,
 	},
 	title: {
 		flex: 1,
@@ -81,11 +85,11 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: FONTCOLOR,
 		textAlign: 'center',
-		padding: 4,
 		marginBottom: MARGIN,
 	},
 	urlInput: {
 		width: width,
+		height: 30,
 		fontFamily: FONTFAMILY,
 		fontSize: 16,
 		color: TEXTINPUTFONTCOLOR,
@@ -94,6 +98,7 @@ const styles = StyleSheet.create({
 	},
 	locationInput: {
 		width: (width - 2 * gridMargin) / 3,
+		height: 30,
 		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		color: TEXTINPUTFONTCOLOR,
@@ -108,9 +113,9 @@ const styles = StyleSheet.create({
 	button: {
 		alignItems: 'center',
 		justifyContent: 'center',
-		height: 32,
+		height: 36,
 		width: 140,
-		borderRadius: 32 / 2,
+		borderRadius: 36 / 2,
 		marginHorizontal: MARGIN,
 		backgroundColor: BUTTONCOLOR,
 	},
@@ -118,6 +123,22 @@ const styles = StyleSheet.create({
 		fontFamily: FONTFAMILY,
 		fontSize: fontSize,
 		color: FONTCOLOR,
+	},
+	radioButtonUnchecked: {
+		width: 18,
+		height: 18,
+		borderRadius: 9,
+		margin: (30 - 18) / 2,
+		backgroundColor: TEXTINPUTBACKGROUNDCOLOR,
+	},
+	radioButtonChecked: {
+		width: 18,
+		height: 18,
+		borderRadius: 9,
+		borderWidth: 6,
+		borderColor: TEXTINPUTBACKGROUNDCOLOR,
+		margin: (30 - 18) / 2,
+		backgroundColor: 'black',
 	},
 });
 
@@ -171,7 +192,23 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 		}, 250);
 	};
 
+	private onChangeUrlCheckbox = (n: string) => {
+		this.settings[CHECKEDURL] = n;
+		this.setState({ settings: this.settings });
+	};
+
 	public render(): JSX.Element | null {
+		const radioUnchecked = <View style={styles.radioButtonUnchecked} />;
+		const radioChecked = <View style={styles.radioButtonChecked} />;
+
+		const urlCheckbox1 =
+			!this.state?.settings[CHECKEDURL] || this.state?.settings[CHECKEDURL] === '1'
+				? radioChecked
+				: radioUnchecked;
+		const urlCheckbox2 = this.state?.settings[CHECKEDURL] === '2' ? radioChecked : radioUnchecked;
+		const urlCheckbox3 = this.state?.settings[CHECKEDURL] === '3' ? radioChecked : radioUnchecked;
+		const urlCheckbox4 = this.state?.settings[CHECKEDURL] === '4' ? radioChecked : radioUnchecked;
+
 		return (
 			<Modal animationType={'fade'} transparent={true} visible={true} onRequestClose={this.props.closeSettings}>
 				<View style={styles.container}>
@@ -180,7 +217,7 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 							<Text style={styles.title}>{packageJson.displayName + '   v' + packageJson.version}</Text>
 						</View>
 						<View style={styles.settingsRow}>
-							<Text style={styles.label}>Stream URL</Text>
+							<Text style={styles.label}>Stream URL 1</Text>
 							<TextInput
 								style={styles.urlInput}
 								spellCheck={false}
@@ -188,6 +225,64 @@ export default class Settings extends Component<SettingsProps, SettingsState> {
 								key={this.state?.settings[STREAMURL] || DEFAULTSTREAMURL}
 								defaultValue={this.state?.settings[STREAMURL] || DEFAULTSTREAMURL}
 							/>
+							<Pressable
+								onPressIn={() => {
+									this.onChangeUrlCheckbox('1');
+								}}
+							>
+								{urlCheckbox1}
+							</Pressable>
+						</View>
+						<View style={styles.settingsRow}>
+							<Text style={styles.label}>Stream URL 2</Text>
+							<TextInput
+								style={styles.urlInput}
+								spellCheck={false}
+								onChangeText={text => this.onChangeText(STREAMURL2, text)}
+								key={this.state?.settings[STREAMURL2]}
+								defaultValue={this.state?.settings[STREAMURL2]}
+							/>
+							<Pressable
+								onPressIn={() => {
+									this.onChangeUrlCheckbox('2');
+								}}
+							>
+								{urlCheckbox2}
+							</Pressable>
+						</View>
+						<View style={styles.settingsRow}>
+							<Text style={styles.label}>Stream URL 3</Text>
+							<TextInput
+								style={styles.urlInput}
+								spellCheck={false}
+								onChangeText={text => this.onChangeText(STREAMURL3, text)}
+								key={this.state?.settings[STREAMURL3]}
+								defaultValue={this.state?.settings[STREAMURL3]}
+							/>
+							<Pressable
+								onPressIn={() => {
+									this.onChangeUrlCheckbox('3');
+								}}
+							>
+								{urlCheckbox3}
+							</Pressable>
+						</View>
+						<View style={styles.settingsRow}>
+							<Text style={styles.label}>Stream URL 4</Text>
+							<TextInput
+								style={styles.urlInput}
+								spellCheck={false}
+								onChangeText={text => this.onChangeText(STREAMURL4, text)}
+								key={this.state?.settings[STREAMURL4]}
+								defaultValue={this.state?.settings[STREAMURL4]}
+							/>
+							<Pressable
+								onPressIn={() => {
+									this.onChangeUrlCheckbox('4');
+								}}
+							>
+								{urlCheckbox4}
+							</Pressable>
 						</View>
 						<View style={styles.settingsRow}>
 							<Text style={styles.label}>Location 1</Text>
