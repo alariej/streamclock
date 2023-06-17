@@ -597,20 +597,21 @@ export default class App extends Component<AppProps, AppState> {
 			if (Number(temperature) && temperature.toString().indexOf('.') === -1) {
 				temperature_ = temperature_ + '.0';
 			}
-			return temperature_ || 'N/A';
+			return Promise.resolve(temperature_ || 'N/A');
 		} else {
-			return 'N/A';
+			return Promise.resolve('N/A');
 		}
 	};
 
-	private setTemperature1 = async () => {
+	private setTemperature1 = async (): Promise<void> => {
 		const temperature = await this.getTemperature(this.latitude1, this.longitude1).catch(() => '');
 		if (temperature && temperature !== this.state.temperature) {
 			this.setState({ temperature: temperature });
 		}
+		return Promise.resolve();
 	};
 
-	private setTemperatureScreenSaver = async () => {
+	private setTemperatureScreenSaver = async (): Promise<void> => {
 		if (this.location2) {
 			this.temperature2 = await this.getTemperature(this.latitude2, this.longitude2).catch(() => '');
 		}
@@ -620,6 +621,7 @@ export default class App extends Component<AppProps, AppState> {
 		if (this.location4) {
 			this.temperature4 = await this.getTemperature(this.latitude4, this.longitude4).catch(() => '');
 		}
+		return Promise.resolve();
 	};
 
 	private getTimeOfDay = (date: Date): string => {
