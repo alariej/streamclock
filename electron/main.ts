@@ -51,6 +51,8 @@ function createWindow() {
 	});
 	*/
 
+	// commented out due to systray issue on Debian Bullseye
+	/* 
 	win.on('minimize', (e: Event) => {
 		e.preventDefault();
 		win?.hide();
@@ -65,6 +67,11 @@ function createWindow() {
 			e.preventDefault();
 			win?.hide();
 		}
+	});
+	*/
+
+	win.on('close', () => {
+		tray?.destroy();
 	});
 
 	ipcMain.on('reset-main-volume', (_event, volume) => {
@@ -103,11 +110,9 @@ function createWindow() {
 	}
 }
 
-/* 
 app.on('window-all-closed', () => {
 	win = null;
 });
-*/
 
 // useless, still get CORS errors reading stream URLs in dev mode
 // app.commandLine.appendSwitch('disable-site-isolation-trials');
@@ -117,7 +122,8 @@ app.on('window-all-closed', () => {
 // useless, media buttons on remote control still not working
 // app.commandLine.appendSwitch('enable-features', 'HardwareMediaKeyHandling, MediaSessionService');
 
-app.commandLine.appendSwitch('enable-features', 'EnableDbusAndX11StatusIcons');
+// useless, still can't click on tray icon in Debian Bullseye
+// app.commandLine.appendSwitch('enable-features', 'EnableDbusAndX11StatusIcons');
 
 app.on('second-instance', () => {
 	win?.show();
