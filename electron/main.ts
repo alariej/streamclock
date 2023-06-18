@@ -117,6 +117,8 @@ app.on('window-all-closed', () => {
 // useless, media buttons on remote control still not working
 // app.commandLine.appendSwitch('enable-features', 'HardwareMediaKeyHandling, MediaSessionService');
 
+app.commandLine.appendSwitch('enable-features', 'EnableDbusAndX11StatusIcons');
+
 app.on('second-instance', () => {
 	win?.show();
 });
