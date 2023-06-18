@@ -759,7 +759,7 @@ export default class App extends Component<AppProps, AppState> {
 
 			const latitude = this.settings[LOC1LAT] || DEFAULTLATITUDE;
 			const longitude = this.settings[LOC1LON] || DEFAULTLONGITUDE;
-			this.location1 = this.settings[LOC1ID];
+			this.location1 = this.settings[LOC1ID] || DEFAULTLOCATION;
 			this.location2 = this.settings[LOC2ID];
 			this.latitude2 = this.settings[LOC2LAT];
 			this.longitude2 = this.settings[LOC2LON];
@@ -870,7 +870,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location2?.substring(0, 3).toUpperCase()}
+							{this.location2.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature2 = (
@@ -887,7 +887,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location3?.substring(0, 3).toUpperCase()}
+							{this.location3.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature3 = (
@@ -904,7 +904,7 @@ export default class App extends Component<AppProps, AppState> {
 							selectable={false}
 							style={[styles.locationScreensaver, { fontSize: fontSizeTemp, paddingRight: paddingRight }]}
 						>
-							{this.location4?.substring(0, 3).toUpperCase()}
+							{this.location4.substring(0, 3).toUpperCase()}
 						</Text>
 					);
 					temperature4 = (
@@ -929,7 +929,7 @@ export default class App extends Component<AppProps, AppState> {
 												{ fontSize: fontSizeTemp, paddingRight: paddingRight },
 											]}
 										>
-											{this.location1?.substring(0, 3).toUpperCase()}
+											{this.location1?.substring(0, 3).toUpperCase() || DEFAULTLOCATION}
 										</Text>
 										{location3}
 									</View>
@@ -960,7 +960,7 @@ export default class App extends Component<AppProps, AppState> {
 			}
 
 			displayView = (
-				<View style={styles.containerScreensaver} /* onPointerDown={this.closeScreenSaver} */>
+				<View style={styles.containerScreensaver}>
 					<View style={styles.streamTitleScreensaver}>
 						<Text numberOfLines={1} style={[styles.streamTitleTextScreensaver, { fontSize: fontSizeSong }]}>
 							{this.state.streamTitlePos === TOP ? this.state.streamTitle : ''}
