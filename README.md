@@ -14,7 +14,6 @@ An Electron **radio-stream-alarm-clock** app meant to run on a Linux device (suc
 - **Volume Control**: Unmutes and sets the system volume to a given level before starting the alarm clock
 - **HDMI-CEC**: Turns the television on and switches the input source to itself before starting the alarm clock (**Note**: Other CEC devices connected to the television might have to be switched off or CEC-disabled, to prevent CEC conflicts)
 - **Screensaver**: Shows a fullscreen view with changing text positioning on a black background, manually or automatically after 60 seconds of idle time (**Note**: This is not a real system-wide screensaver, as user activity outside of the app is ignored)
-- **Tray**: The app minimizes and closes to the system tray, so that it keeps running in the background when hidden (**Note**: Use the corresponding tray menu item to completely quit the app)
 
 ## Run dev locally
 
@@ -38,7 +37,7 @@ This was only tested on a Raspberry Pi 4B running Raspberry Pi OS (Bullseye, 64-
 - `sudo apt install zlib1g-dev` (may be required)
 - `sudo apt install libfuse2` (may be required)
 - `sudo apt install cec-utils` (optional, may be required)
-- Add app to startup programs (Add `@./streamclock-arm64.AppImage` at the end of file `/etc/xdg/lxsession/LXDE-pi/autostart`, optional)
+- Add app to startup programs (Add `@./streamclock-arm64.AppImage` at the end of file `/etc/xdg/lxsession/LXDE-pi/autostart`, obviously does not work when activating the experimental Wayland support, optional)
 - Start app via command line (`./streamclock-arm64.AppImage`) or file manager
 
 ## HDMI-CEC
