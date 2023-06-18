@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { StyleSheet, Pressable, Text, View, LayoutChangeEvent } from 'react-native';
+import { StyleSheet, Pressable, Text, View } from 'react-native';
 import IcecastMetadataPlayer, { IcyMetadata } from 'icecast-metadata-player';
 import {
 	alarmIcon,
@@ -402,9 +402,6 @@ export default class App extends Component<AppProps, AppState> {
 			this.screensaverCountdown();
 		}
 
-		const { ipcRenderer } = window.require('electron');
-		ipcRenderer.send('set-alarm-tray', alarmOnOff === ON);
-
 		window.addEventListener('click', this.onUserEvent, true);
 		window.addEventListener('keypress', this.onUserEvent, true);
 	}
@@ -723,9 +720,6 @@ export default class App extends Component<AppProps, AppState> {
 		const store = new Store();
 		store.set(ALARMONOFF, alarmOnOff);
 		this.setState({ checkedAlarm: !this.state.checkedAlarm });
-
-		const { ipcRenderer } = window.require('electron');
-		ipcRenderer.send('set-alarm-tray', alarmOnOff === ON);
 	};
 
 	private closeSettings = () => {
