@@ -70,6 +70,7 @@ import {
 } from './uiconfig';
 import Store from 'electron-store';
 import AlarmSettings from './settingsAlarm';
+import { Dimensions } from 'react-native';
 
 const alarmWidth = 140;
 const streamTitleHeight = 48;
@@ -308,6 +309,9 @@ export default class App extends Component<AppProps, AppState> {
 			isScreensaver: false,
 			streamTitlePos: TOP,
 		};
+
+		this.screensaverWidth = Dimensions.get('screen').width;
+		this.screensaverHeight = Dimensions.get('screen').height;
 	}
 
 	public async componentDidMount(): Promise<void> {
@@ -665,16 +669,14 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private onPressScreensaver = async () => {
-		const { ipcRenderer } = window.require('electron');
-		ipcRenderer.send('enter-fullscreen');
-
 		if (this.location2) {
 			await this.setTemperatureScreenSaver().catch(() => null);
 		}
-		this.setState({ pressed: SCREENSAVER, isScreensaver: true });
-		setTimeout(() => {
-			this.setState({ pressed: '' });
-		}, 250);
+
+		this.setState({ isScreensaver: true });
+
+		const { ipcRenderer } = window.require('electron');
+		ipcRenderer.send('enter-fullscreen');
 
 		let lastTitle = this.state.streamTitle;
 		this.streamTitleInterval = setInterval(() => {
@@ -821,11 +823,6 @@ export default class App extends Component<AppProps, AppState> {
 	private closeScreenSaver = () => {
 		document?.exitFullscreen().catch(() => null);
 		this.setState({ isScreensaver: false });
-	};
-
-	private onScreensaverLayout = (e: LayoutChangeEvent) => {
-		this.screensaverHeight = e.nativeEvent.layout.height;
-		this.screensaverWidth = e.nativeEvent.layout.width;
 	};
 
 	public render(): JSX.Element | null {
@@ -1057,7 +1054,7 @@ export default class App extends Component<AppProps, AppState> {
 		}
 
 		return (
-			<View style={styles.container} id={'fullscreenview'} onLayout={this.onScreensaverLayout}>
+			<View style={styles.container} id={'fullscreenview'}>
 				{displayView}
 			</View>
 		);
