@@ -57,7 +57,11 @@ function createWindow() {
 	});
 
 	win.on('close', (e: Event) => {
-		if (!doQuit) {
+		if (doQuit || VITE_DEV_SERVER_URL) {
+			win = null;
+			tray?.destroy();
+			app.quit();
+		} else {
 			e.preventDefault();
 			win?.hide();
 		}
