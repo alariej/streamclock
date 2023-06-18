@@ -1,4 +1,4 @@
-import { app, Tray, Menu, nativeImage, BrowserWindow, Event } from 'electron';
+import { app, Tray, Menu, nativeImage, BrowserWindow } from 'electron';
 import { ipcMain } from 'electron';
 import path from 'node:path';
 import * as loudness from '@matthey/loudness';
@@ -22,7 +22,7 @@ let win: BrowserWindow | null;
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 
 let tray: Tray | null;
-let doQuit = false;
+// let doQuit = false;
 
 function createWindow() {
 	win = new BrowserWindow({
@@ -136,7 +136,7 @@ const showApp = () => {
 const quitApp = () => {
 	win = null;
 	tray = null;
-	doQuit = true;
+	// doQuit = true;
 	app.quit();
 };
 
