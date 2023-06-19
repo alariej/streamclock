@@ -404,6 +404,17 @@ export default class App extends Component<AppProps, AppState> {
 
 		window.addEventListener('click', this.onUserEvent, true);
 		window.addEventListener('keypress', this.onUserEvent, true);
+
+		const onPlayKey = (_e: MediaSessionActionDetails) => {
+			this.startStream(false);
+		};
+
+		const onPauseKey = (_e: MediaSessionActionDetails) => {
+			this.stopStream(false);
+		};
+
+		navigator.mediaSession.setActionHandler('play', onPlayKey);
+		navigator.mediaSession.setActionHandler('pause', onPauseKey);
 	}
 
 	public componentWillUnmount(): void {
