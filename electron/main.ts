@@ -4,6 +4,7 @@ import path from 'node:path';
 import * as loudness from '@matthey/loudness';
 import Store from 'electron-store';
 import * as child from 'node:child_process';
+import { appendFile } from 'fs';
 
 // The built directory structure
 //
@@ -56,12 +57,23 @@ function createWindow() {
 	});
 
 	ipcMain.on('turn-on-cec', (_event, CECAddress) => {
+		const log = new Date().toLocaleString('DE-CH') + ' - ' + CECAddress + '\r\n';
+		appendFile('streamclock.txt', log, () => null);
+
 		const turnOn = 'echo "on ' + CECAddress + '" | cec-client -s -d 1';
 		child.exec(turnOn);
 
 		const changeSource = 'echo "as" | cec-client -s -d 1';
 		setTimeout(() => {
 			child.exec(changeSource);
+
+			/* 
+			const checkPower = 'echo "pow ' + CECAddress + '" | cec-client -s -d 1';
+			child.exec(checkPower, (err, output) => {
+				console.log(err);
+				console.log(output);
+			});
+			*/
 		}, 5 * 1000);
 	});
 
