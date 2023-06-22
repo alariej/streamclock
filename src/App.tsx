@@ -376,7 +376,7 @@ export default class App extends Component<AppProps, AppState> {
 				let delay = 1;
 				if (this.CECAddress) {
 					this.turnOnCEC();
-					delay = 10;
+					delay = 12;
 				}
 				setTimeout(() => {
 					this.resetMainVolume();
@@ -413,6 +413,7 @@ export default class App extends Component<AppProps, AppState> {
 			this.stopStream(false);
 		};
 
+		// useless, still can't play / pause the stream
 		navigator.mediaSession.setActionHandler('play', onPlayKey);
 		navigator.mediaSession.setActionHandler('pause', onPauseKey);
 	}

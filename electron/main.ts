@@ -74,7 +74,7 @@ function createWindow() {
 				console.log(output);
 			});
 			*/
-		}, 5 * 1000);
+		}, 9 * 1000);
 	});
 
 	ipcMain.on('enter-fullscreen', () => {
