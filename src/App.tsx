@@ -626,24 +626,8 @@ export default class App extends Component<AppProps, AppState> {
 
 			if (response?.status === 200) {
 				const weatherInfo = await response.json().catch(() => null);
-				/* 
-				console.log(weatherInfo);
-				console.log(weatherInfo.wind.deg);
-				console.log(weatherInfo.wind.speed * 3.6);
-				console.log(weatherInfo.wind.gust * 3.6);
-				console.log(weatherInfo.main.temp);
-				console.log(weatherInfo.main.humidity);
-				console.log(weatherInfo.main.pressure);
-				console.log(weatherInfo.timezone);
-				console.log(new Date(weatherInfo.sys.sunrise * 1000).toLocaleTimeString('de-CH', { timeStyle: 'short' }));
-				console.log(new Date(weatherInfo.sys.sunset * 1000).toLocaleTimeString('de-CH', { timeStyle: 'short' }));
-				console.log(weatherInfo.weather[0].description);
-				console.log(weatherInfo.weather[0].main);
-				console.log(weatherInfo.rain);
-				*/
-				const temperature = Math.round(weatherInfo?.main?.temp * 10) / 10;
 
-				return Promise.resolve(temperature.toString() || 'N/A');
+				return Promise.resolve(weatherInfo?.main?.temp?.toFixed(1) || 'N/A');
 			} else {
 				return Promise.resolve('N/A');
 			}
@@ -658,12 +642,8 @@ export default class App extends Component<AppProps, AppState> {
 
 			if (response?.status === 200) {
 				const weatherInfo = await response.json().catch(() => null);
-				const temperature = weatherInfo.current_weather.temperature;
-				let temperature_ = temperature;
-				if (Number(temperature) && temperature.toString().indexOf('.') === -1) {
-					temperature_ = temperature_ + '.0';
-				}
-				return Promise.resolve(temperature_ || 'N/A');
+
+				return Promise.resolve(weatherInfo?.current_weather?.temperature.toFixed(1) || 'N/A');
 			} else {
 				return Promise.resolve('N/A');
 			}
@@ -680,13 +660,13 @@ export default class App extends Component<AppProps, AppState> {
 
 	private setTemperatureScreenSaver = async (): Promise<void> => {
 		if (this.location2) {
-			this.temperature2 = await this.getTemperature(this.latitude2, this.longitude2).catch(() => '');
+			this.temperature2 = await this.getTemperature(this.latitude2, this.longitude2).catch(() => 'N/A');
 		}
 		if (this.location3) {
-			this.temperature3 = await this.getTemperature(this.latitude3, this.longitude3).catch(() => '');
+			this.temperature3 = await this.getTemperature(this.latitude3, this.longitude3).catch(() => 'N/A');
 		}
 		if (this.location4) {
-			this.temperature4 = await this.getTemperature(this.latitude4, this.longitude4).catch(() => '');
+			this.temperature4 = await this.getTemperature(this.latitude4, this.longitude4).catch(() => 'N/A');
 		}
 		return Promise.resolve();
 	};
