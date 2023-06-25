@@ -71,6 +71,7 @@ import {
 import Store from 'electron-store';
 import AlarmSettings from './settingsAlarm';
 import { Dimensions } from 'react-native';
+import config from './config.json';
 
 const alarmWidth = 140;
 const streamTitleHeight = 48;
@@ -611,24 +612,61 @@ export default class App extends Component<AppProps, AppState> {
 	};
 
 	private getTemperature = async (latitude: string, longitude: string): Promise<string> => {
-		const response = await fetch(
-			'https://api.open-meteo.com/v1/forecast?latitude=' +
-				latitude +
-				'&longitude=' +
-				longitude +
-				'&current_weather=true&forecast_days=1'
-		).catch(() => null);
+		if (config.openweathermapKey) {
+			const response = await fetch(
+				'https://api.openweathermap.org/data/2.5/weather?lat=' +
+					latitude +
+					'&lon=' +
+					longitude +
+					'&appid=' +
+					config.openweathermapKey +
+					'&units=metric' +
+					'&mode=json'
+			).catch(() => null);
 
-		if (response?.status === 200) {
-			const weatherInfo = await response.json().catch(() => null);
-			const temperature = weatherInfo.current_weather.temperature;
-			let temperature_ = temperature;
-			if (Number(temperature) && temperature.toString().indexOf('.') === -1) {
-				temperature_ = temperature_ + '.0';
+			if (response?.status === 200) {
+				const weatherInfo = await response.json().catch(() => null);
+				/* 
+				console.log(weatherInfo);
+				console.log(weatherInfo.wind.deg);
+				console.log(weatherInfo.wind.speed * 3.6);
+				console.log(weatherInfo.wind.gust * 3.6);
+				console.log(weatherInfo.main.temp);
+				console.log(weatherInfo.main.humidity);
+				console.log(weatherInfo.main.pressure);
+				console.log(weatherInfo.timezone);
+				console.log(new Date(weatherInfo.sys.sunrise * 1000).toLocaleTimeString('de-CH', { timeStyle: 'short' }));
+				console.log(new Date(weatherInfo.sys.sunset * 1000).toLocaleTimeString('de-CH', { timeStyle: 'short' }));
+				console.log(weatherInfo.weather[0].description);
+				console.log(weatherInfo.weather[0].main);
+				console.log(weatherInfo.rain);
+				*/
+				const temperature = Math.round(weatherInfo?.main?.temp * 10) / 10;
+
+				return Promise.resolve(temperature.toString() || 'N/A');
+			} else {
+				return Promise.resolve('N/A');
 			}
-			return Promise.resolve(temperature_ || 'N/A');
 		} else {
-			return Promise.resolve('N/A');
+			const response = await fetch(
+				'https://api.open-meteo.com/v1/forecast?latitude=' +
+					latitude +
+					'&longitude=' +
+					longitude +
+					'&current_weather=true&forecast_days=1'
+			).catch(() => null);
+
+			if (response?.status === 200) {
+				const weatherInfo = await response.json().catch(() => null);
+				const temperature = weatherInfo.current_weather.temperature;
+				let temperature_ = temperature;
+				if (Number(temperature) && temperature.toString().indexOf('.') === -1) {
+					temperature_ = temperature_ + '.0';
+				}
+				return Promise.resolve(temperature_ || 'N/A');
+			} else {
+				return Promise.resolve('N/A');
+			}
 		}
 	};
 

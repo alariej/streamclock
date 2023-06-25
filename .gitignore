@@ -26,3 +26,4 @@ release
 *.sw?
 package-lock.json
 dist-appImage/*
+src/config.json
