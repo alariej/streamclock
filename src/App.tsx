@@ -373,7 +373,7 @@ export default class App extends Component<AppProps, AppState> {
 			const date = new Date();
 			const timeOfDay = this.getTimeOfDay(date);
 
-			if (this.player.state !== 'playing' && this.alarmTime === timeOfDay) {
+			if (this.state.checkedAlarm && this.player.state !== 'playing' && this.alarmTime === timeOfDay) {
 				let delay = 1;
 				if (this.CECAddress) {
 					this.turnOnCEC();
