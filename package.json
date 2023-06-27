@@ -2,7 +2,7 @@
 	"name": "streamclock",
 	"displayName": "StreamClock",
 	"private": true,
-	"version": "0.3.6",
+	"version": "0.3.7",
 	"main": "dist-electron/main.js",
 	"scripts": {
 		"dev": "vite",
